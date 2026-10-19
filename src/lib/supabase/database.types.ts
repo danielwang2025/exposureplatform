@@ -251,6 +251,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"reports": {
+                  Row: {
+                    "child_id": string,"created_at": string,"created_by": string | null,"highlight_media_ids": (string)[],"id": string,"period_end": string,"period_start": string,"summary": string,"title": string,"updated_at": string,"visibility": Database["public"]['Enums']["visibility"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "child_id": string,"created_at"?: string,"created_by"?: string | null,"highlight_media_ids"?: (string)[],"id"?: string,"period_end": string,"period_start": string,"summary"?: string,"title": string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["visibility"]
+                  }
+                  Update: {
+                    "child_id"?: string,"created_at"?: string,"created_by"?: string | null,"highlight_media_ids"?: (string)[],"id"?: string,"period_end"?: string,"period_start"?: string,"summary"?: string,"title"?: string,"updated_at"?: string,"visibility"?: Database["public"]['Enums']["visibility"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "reports_child_id_fkey"
+      columns: ["child_id"]
+isOneToOne: false
+      referencedRelation: "children"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "reports_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"share_links": {
                   Row: {
                     "child_id": string,"created_at": string,"created_by": string | null,"expires_at": string | null,"id": string,"label": string | null,"last_viewed_at": string | null,"post_id": string | null,"project_id": string | null,"revoked_at": string | null,"scope": Database["public"]['Enums']["share_scope"],"token": string,"view_count": number
@@ -352,6 +378,9 @@ isOneToOne: false
                            },
 "can_edit_post":
 { Args: { "p_post_id": string }; Returns: boolean
+                           },
+"can_edit_report":
+{ Args: { "p_child_id": string,"p_created_by": string }; Returns: boolean
                            },
 "can_read_post":
 { Args: { "p_child_id": string,"p_visibility": Database["public"]['Enums']["visibility"] }; Returns: boolean

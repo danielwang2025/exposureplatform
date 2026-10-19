@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { RadarChart } from "@/components/charts/radar-chart";
 import { TrendChart } from "@/components/charts/trend-chart";
+import { Score } from "@/components/score";
 import { buttonClass, Card, cn } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { atLeast, getChild } from "@/lib/data/children";
@@ -178,15 +179,5 @@ export default async function SkillsPage({ params, searchParams }: PageProps<"/c
         </>
       )}
     </div>
-  );
-}
-
-// Level words only fit on wider screens; the number is always shown.
-function Score({ score, level }: { score: number; level: string }) {
-  return (
-    <span title={level}>
-      {score}
-      <span className="hidden sm:inline"> · {level}</span>
-    </span>
   );
 }

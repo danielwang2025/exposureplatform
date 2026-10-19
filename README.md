@@ -79,6 +79,14 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - Ratings are members-only: share links and the public page never load them.
 - The **Skills tab** shows a radar of the latest score per active skill against 3, 6 or 12 months ago, a comparison table, and a trend line per skill whose points link to their reviews. It is built from the ratings the viewer can read, so a private review never shapes what family members see. Charts are plain SVG (`src/components/charts/`), with series colors checked for color-blind safety in light and dark mode.
 
+## Growth reports (v1.1)
+
+- Owners and editors create a **report** for any period (presets: this month, last month, last 3 months, this year, last year; up to 3 years), write a summary and pick up to six highlight photos from that period.
+- The rest is computed when the report is opened, from what the reader can see: post/milestone/review/photo counts, skills at the start vs. end of the period (radar + table), milestones and projects. A family member's copy never counts guardian-only posts or ratings.
+- Visibility is "Only guardians" or "Family"; reports have no share link or public page. Edit rules match posts (author while an editor, or any owner).
+- **Download PDF** opens the browser's print dialog ("Save as PDF"). Print styles hide the site chrome and always print on light paper, even with a dark system theme.
+- Skills, ratings and reports are included in the account's data export.
+
 ## Comments, email and maintenance
 
 - **Comments/likes**: only signed-in members who can read the post; the owner can delete any comment. Never loaded on share links or the public page.
@@ -111,5 +119,5 @@ src/proxy.ts             session refresh + route protection
 - [ ] v1.1
   - [x] M1: skills and 1–5 ratings on review posts
   - [x] M2: skills tab (radar chart + trends)
-  - [ ] M3: growth reports (print to PDF)
+  - [x] M3: growth reports (print to PDF)
   - [ ] Teacher role, Stripe paid upgrades

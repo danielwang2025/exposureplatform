@@ -54,3 +54,26 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Printing (growth reports → "Save as PDF"): white page, keep chart colors. */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  /* Paper is always light, even when the screen theme is dark. */
+  :root {
+    --background: #ffffff;
+    --surface: #ffffff;
+    --foreground: #1f2421;
+    --muted: #6b726d;
+    --border: #e6e3dc;
+    --primary: #2f855a;
+    --primary-soft: #e6f4ea;
+    --chart-now: #2f855a;
+    --chart-before: #3b82f6;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

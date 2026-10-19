@@ -67,28 +67,38 @@ export async function GET() {
       zip.end();
 
       async function addChild(childId: string, folder: string) {
-        const [{ data: child }, { data: members }, { data: projects }, { data: posts }] = await Promise.all([
-          supabase.from("children").select("nickname, birth_date, max_visibility, slug, created_at").eq("id", childId).single(),
-          supabase.from("child_members").select("role, profiles ( display_name )").eq("child_id", childId),
-          supabase.from("projects").select("id, title, description, emoji, visibility, created_at").eq("child_id", childId),
-          supabase
-            .from("posts")
-            .select(`
-              id, kind, title, body, occurred_on, visibility, created_at, project_id,
-              profiles ( display_name ),
-              media ( id, kind, status, position, storage_path, duration_seconds ),
-              comments ( body, created_at, profiles ( display_name ) ),
-              post_likes ( user_id )
-            `)
-            .eq("child_id", childId)
-            .order("occurred_on", { ascending: true }),
-        ]);
+        const [{ data: child }, { data: members }, { data: projects }, { data: posts }, { data: skills }, { data: reports }] =
+          await Promise.all([
+            supabase.from("children").select("nickname, birth_date, max_visibility, slug, created_at").eq("id", childId).single(),
+            supabase.from("child_members").select("role, profiles ( display_name )").eq("child_id", childId),
+            supabase.from("projects").select("id, title, description, emoji, visibility, created_at").eq("child_id", childId),
+            supabase
+              .from("posts")
+              .select(`
+                id, kind, title, body, occurred_on, visibility, created_at, project_id,
+                profiles ( display_name ),
+                media ( id, kind, status, position, storage_path, duration_seconds ),
+                comments ( body, created_at, profiles ( display_name ) ),
+                post_likes ( user_id ),
+                skill_ratings ( score, skills ( name ) )
+              `)
+              .eq("child_id", childId)
+              .order("occurred_on", { ascending: true }),
+            supabase.from("skills").select("name, emoji, archived_at, created_at").eq("child_id", childId).order("position"),
+            supabase
+              .from("reports")
+              .select("title, period_start, period_end, summary, visibility, created_at")
+              .eq("child_id", childId)
+              .order("period_end"),
+          ]);
 
         addJson(`${folder}/profile.json`, {
           ...child,
           members: (members ?? []).map((m) => ({ name: m.profiles?.display_name, role: m.role })),
         });
         addJson(`${folder}/projects.json`, projects ?? []);
+        if (skills?.length) addJson(`${folder}/skills.json`, skills);
+        if (reports?.length) addJson(`${folder}/reports.json`, reports);
 
         const videos: unknown[] = [];
         const exportedPosts = [];
@@ -117,6 +127,9 @@ export async function GET() {
             project: projects?.find((p) => p.id === post.project_id)?.title ?? null,
             author: post.profiles?.display_name ?? null,
             photos,
+            ...(post.skill_ratings.length > 0 && {
+              ratings: post.skill_ratings.map((r) => ({ skill: r.skills?.name ?? null, score: r.score })),
+            }),
             likes: post.post_likes.length,
             comments: post.comments.map((c) => ({ author: c.profiles?.display_name, body: c.body, createdAt: c.created_at })),
           });
@@ -147,7 +160,9 @@ account.json        Your account, memberships and the comments you wrote.
 <child>/profile.json  The child profile and its members.
 <child>/posts.json    Every post (oldest first) with comments and photo file names.
 <child>/projects.json Projects.
-<child>/photos/       Full-size photos, named date_post_number.jpg.
+<child>/skills.json   Skills you follow (ratings are on each review in posts.json).
+<child>/reports.json  Growth reports: period, summary and visibility.
+<child>/photos/      Full-size photos, named date_post_number.jpg.
 <child>/videos.json   Videos are streamed from our video provider and are not
                       included in this file. Open them in Sprout to watch them.
 
@@ -161,6 +176,8 @@ account.json          你的账号、所在的档案，以及你写过的评论�
 <孩子>/profile.json   孩子档案及其成员。
 <孩子>/posts.json     所有记录（从早到晚），含评论和照片文件名。
 <孩子>/projects.json  成长项目。
+<孩子>/skills.json    关注的能力项（评分记录在 posts.json 的每条点评里）。
+<孩子>/reports.json   成长报告：时间段、总结和可见范围。
 <孩子>/photos/        原尺寸照片，文件名为 日期_记录_序号.jpg。
 <孩子>/videos.json    视频由视频服务商托管，未包含在本文件中，请在 Sprout 中观看。
 

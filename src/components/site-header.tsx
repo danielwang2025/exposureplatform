@@ -14,7 +14,7 @@ export async function SiteHeader() {
   ]);
 
   return (
-    <header className="border-b border-border bg-surface">
+    <header className="border-b border-border bg-surface print:hidden">
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 font-semibold">
           <span aria-hidden className="text-xl">🌱</span>

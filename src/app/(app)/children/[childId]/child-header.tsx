@@ -4,7 +4,7 @@ import { ChildAge, ChildAvatar } from "@/components/child-badge";
 import { buttonClass, cn } from "@/components/ui";
 import { atLeast, type ChildWithRole } from "@/lib/data/children";
 
-type Tab = "timeline" | "milestones" | "projects" | "skills";
+type Tab = "timeline" | "milestones" | "projects" | "skills" | "reports";
 
 export async function ChildHeader({ child, active }: { child: ChildWithRole; active: Tab }) {
   const [t, tp, tRoles, tTabs] = await Promise.all([
@@ -19,6 +19,7 @@ export async function ChildHeader({ child, active }: { child: ChildWithRole; act
     { key: "milestones", href: `${base}/milestones` },
     { key: "projects", href: `${base}/projects` },
     { key: "skills", href: `${base}/skills` },
+    { key: "reports", href: `${base}/reports` },
   ];
 
   return (
@@ -43,14 +44,19 @@ export async function ChildHeader({ child, active }: { child: ChildWithRole; act
           )}
         </div>
       </div>
-      <nav className="flex gap-1 border-b border-border" aria-label={child.nickname}>
+      {/* Scrolls sideways on narrow screens; the inset shadow is the baseline, so
+          the active underline isn't clipped the way a negative margin would be. */}
+      <nav
+        className="flex gap-1 overflow-x-auto shadow-[inset_0_-1px_0_var(--border)] [scrollbar-width:none]"
+        aria-label={child.nickname}
+      >
         {tabs.map((tab) => (
           <Link
             key={tab.key}
             href={tab.href}
             aria-current={tab.key === active ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
+              "shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap",
               tab.key === active ? "border-primary text-primary" : "border-transparent text-muted hover:text-foreground",
             )}
           >

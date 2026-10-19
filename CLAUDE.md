@@ -39,7 +39,8 @@ and DEPLOY.md for production setup.
   Likely a malformed `NEXT_PUBLIC_SUPABASE_URL`. After changing NEXT_PUBLIC_* vars, redeploy.
 - Before real families: buy a domain → SMTP (Resend) → turn email confirmation back on; fill the
   [bracketed] placeholders in `src/app/(legal)/` and get legal review; Supabase Pro for backups.
-- v1.1 in progress. M1 live in production; M2 (Skills tab, `src/components/charts/`) committed locally, no migration. M1: `skills` + `skill_ratings` (migration 20261019140949), ratings on
+- v1.1 in progress. M1 live in production. M2 (Skills tab, `src/components/charts/`, no migration) and M3
+  (growth reports, migration 20261019143630_reports) committed locally, not yet deployed. M1: `skills` + `skill_ratings` (migration 20261019140949), ratings on
   review posts, members-only. Next: M2 skills tab (radar + trends, hand-written SVG), M3 growth reports
   (print CSS → browser "Save as PDF"). Then teacher role; Stripe last.
 - Deploy order for any migration: `npx supabase db push` to production first, then push code (Vercel
