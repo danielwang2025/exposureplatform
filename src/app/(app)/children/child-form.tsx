@@ -7,6 +7,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Alert, Field, Input, Select } from "@/components/ui";
 import { useMessage } from "@/components/use-message";
 import type { FormState } from "@/lib/forms";
+import { useLocalToday } from "@/components/use-local-today";
 
 const visibilityOptions = ["private", "family", "link", "public"] as const;
 
@@ -24,7 +25,7 @@ export function ChildForm({ action, defaults, mode, disabled }: Props) {
   const m = useMessage();
   const [state, formAction] = useActionState(action, null);
   const values = state?.values;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = useLocalToday();
 
   return (
     <form action={formAction} className="space-y-5" noValidate>

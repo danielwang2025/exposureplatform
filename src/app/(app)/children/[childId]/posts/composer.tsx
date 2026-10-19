@@ -11,6 +11,7 @@ import { uploadImage, uploadVideo } from "@/lib/client/upload";
 import type { Visibility } from "@/lib/data/children";
 import type { PostKind, TimelineMedia } from "@/lib/data/posts";
 import { scoreLevels } from "@/lib/skill-presets";
+import { useLocalToday } from "@/components/use-local-today";
 
 const kinds: { value: PostKind; icon: string }[] = [
   { value: "moment", icon: "📷" },
@@ -73,7 +74,7 @@ export function Composer({
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = useLocalToday();
   const allowedVisibilities: Visibility[] = reviewOnly
     ? ["family"]
     : visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
@@ -264,7 +265,16 @@ export function Composer({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("date")} htmlFor="occurredOn" error={m(fieldErrors.occurredOn)}>
-            <Input id="occurredOn" name="occurredOn" type="date" max={today} required defaultValue={post?.occurredOn ?? today} />
+            {/* Re-keyed so a new post's default date follows the device's date after hydration. */}
+            <Input
+              key={post ? "saved" : today}
+              id="occurredOn"
+              name="occurredOn"
+              type="date"
+              max={today}
+              required
+              defaultValue={post?.occurredOn ?? today}
+            />
           </Field>
           {reviewOnly ? (
             <Field label={t("visibility")} htmlFor="visibility" hint={t("teacherVisibilityHint")}>

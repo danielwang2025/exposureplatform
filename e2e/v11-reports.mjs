@@ -49,8 +49,10 @@ for (const preset of ["Music", "Reading", "Sports"]) {
   await a.locator(`button:has-text("${preset}")`).first().click();
   await a.locator("li", { hasText: preset }).first().waitFor();
 }
-const today = new Date().toISOString().slice(0, 10);
-const daysAgo = (n) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+// Local calendar dates, as the browser (same machine) sees them.
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const today = ymd(new Date());
+const daysAgo = (n) => ymd(new Date(Date.now() - n * 86_400_000));
 async function post({ kind, title, date, visibility, files = [], scores = {} }) {
   await a.goto(`${childUrl}/posts/new?kind=${kind}`);
   await a.fill("#title", title);

@@ -68,7 +68,7 @@ async function review(title, date, visibility, scores) {
 const iso = (monthsAgo) => {
   const d = new Date();
   d.setMonth(d.getMonth() - monthsAgo);
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 await review("Last autumn", iso(11), "family", { Music: 2, Reading: 2, Sports: 1 });
 await review("Spring", iso(5), "family", { Music: 3, Reading: 3, Sports: 2 });

@@ -11,6 +11,7 @@ import { checkbox, email, fieldErrorsFrom, formValues, type FormState } from "@/
 import { siteOrigin } from "@/lib/site";
 import { purgeMediaFiles } from "@/lib/media-cleanup";
 import { createClient } from "@/lib/supabase/server";
+import { latestPossibleToday } from "@/lib/dates";
 
 function dbErrorKey(error: PostgrestError): string {
   if (error.hint === "last_owner") return "errors.lastOwner";
@@ -25,7 +26,7 @@ const childDetails = z.object({
     .trim()
     .transform((value) => value || null)
     .refine(
-      (value) => value === null || (/^\d{4}-\d{2}-\d{2}$/.test(value) && value <= new Date().toISOString().slice(0, 10)),
+      (value) => value === null || (/^\d{4}-\d{2}-\d{2}$/.test(value) && value <= latestPossibleToday()),
       "validation.birthDate",
     ),
   maxVisibility: z.enum(visibilities),

@@ -14,6 +14,7 @@ import { canUploadVideo } from "@/lib/data/billing";
 import { getMux } from "@/lib/mux";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { latestPossibleToday } from "@/lib/dates";
 
 type ActionResult<T = object> =
   | ({ ok: true } & T)
@@ -49,7 +50,7 @@ const postInput = z.object({
   occurredOn: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "validation.date")
-    .refine((v) => v <= new Date().toISOString().slice(0, 10), "validation.dateFuture"),
+    .refine((v) => v <= latestPossibleToday(), "validation.dateFuture"),
   visibility: z.enum(visibilities),
   projectId: z
     .string()
