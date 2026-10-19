@@ -14,7 +14,9 @@ import { getMux, isVideoEnabled } from "@/lib/mux";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-type ActionResult<T = object> = ({ ok: true } & T) | { ok: false; error?: string; fieldErrors?: Record<string, string> };
+type ActionResult<T = object> =
+  | ({ ok: true } & T)
+  | { ok: false; error?: string; fieldErrors?: Record<string, string>; postId?: string };
 
 function dbErrorKey(error: PostgrestError): string {
   switch (error.hint) {
@@ -26,6 +28,8 @@ function dbErrorKey(error: PostgrestError): string {
       return "posts.errors.fileTooLarge";
     case "too_many_files":
       return "posts.errors.tooManyFiles";
+    case "skill_archived":
+      return "skills.errors.archived";
   }
   if (error.code === "42501") return "errors.forbidden";
   // Foreign key: the chosen project doesn't belong to this child.
@@ -50,6 +54,10 @@ const postInput = z.object({
     .string()
     .transform((v) => v || null)
     .refine((v) => v === null || isUuid(v), "errors.forbidden"),
+  // skill id -> 1..5; only saved on reviews.
+  ratings: z
+    .record(z.string().refine(isUuid, "errors.forbidden"), z.int().min(1).max(5))
+    .default({}),
 });
 export type PostInput = z.input<typeof postInput>;
 
@@ -90,6 +98,11 @@ export async function createPost(
   if (error) return { ok: false, error: dbErrorKey(error) };
 
   revalidatePath(`/children/${childId}`);
+  if (parsed.data.kind === "review") {
+    const ratingsError = await saveRatings(supabase, data.id, parsed.data.ratings);
+    // The post exists either way; hand back its id so a retry edits it.
+    if (ratingsError) return { ok: false, error: ratingsError, postId: data.id };
+  }
   return { ok: true, postId: data.id };
 }
 
@@ -117,7 +130,21 @@ export async function updatePost(childId: string, postId: string, input: PostInp
   if (data.length === 0) return { ok: false, error: "errors.forbidden" };
 
   revalidatePath(`/children/${childId}`, "layout");
+  // Other kinds lose their ratings in the database (posts_drop_ratings_off_review).
+  if (parsed.data.kind === "review") {
+    const ratingsError = await saveRatings(supabase, postId, parsed.data.ratings);
+    if (ratingsError) return { ok: false, error: ratingsError };
+  }
   return { ok: true };
+}
+
+async function saveRatings(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  postId: string,
+  ratings: Record<string, number>,
+): Promise<string | undefined> {
+  const { error } = await supabase.rpc("set_post_ratings", { p_post_id: postId, p_ratings: ratings });
+  return error ? dbErrorKey(error) : undefined;
 }
 
 export async function deletePost(childId: string, postId: string): Promise<ActionResult> {

@@ -289,6 +289,58 @@ isOneToOne: false
       referencedColumns: ["id","child_id"]
     }
                   ]
+                },"skill_ratings": {
+                  Row: {
+                    "child_id": string,"created_at": string,"post_id": string,"score": number,"skill_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "child_id": string,"created_at"?: string,"post_id": string,"score": number,"skill_id": string
+                  }
+                  Update: {
+                    "child_id"?: string,"created_at"?: string,"post_id"?: string,"score"?: number,"skill_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "skill_ratings_post_id_child_id_fkey"
+      columns: ["post_id","child_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id","child_id"]
+    },{
+      foreignKeyName: "skill_ratings_skill_id_child_id_fkey"
+      columns: ["skill_id","child_id"]
+isOneToOne: false
+      referencedRelation: "skills"
+      referencedColumns: ["id","child_id"]
+    }
+                  ]
+                },"skills": {
+                  Row: {
+                    "archived_at": string | null,"child_id": string,"created_at": string,"created_by": string | null,"emoji": string | null,"id": string,"name": string,"position": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "archived_at"?: string | null,"child_id": string,"created_at"?: string,"created_by"?: string | null,"emoji"?: string | null,"id"?: string,"name": string,"position"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"child_id"?: string,"created_at"?: string,"created_by"?: string | null,"emoji"?: string | null,"id"?: string,"name"?: string,"position"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "skills_child_id_fkey"
+      columns: ["child_id"]
+isOneToOne: false
+      referencedRelation: "children"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "skills_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -368,6 +420,9 @@ isOneToOne: false
                            },
 "set_child_slug":
 { Args: { "p_child_id": string,"p_slug": string }; Returns: string
+                           },
+"set_post_ratings":
+{ Args: { "p_post_id": string,"p_ratings": Json }; Returns: undefined
                            },
 "settle_media":
 { Args: { "p_bytes": number,"p_duration"?: number,"p_height"?: number,"p_media_id": string,"p_width"?: number }; Returns: undefined

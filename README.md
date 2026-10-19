@@ -72,6 +72,12 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - Lowering the child's `max_visibility` takes effect immediately: every share link and the public page go dark.
 - `/s/`, `/c/` and `/invite/` respond with `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex`.
 
+## Skills and ratings (v1.1)
+
+- Each child has up to 12 active **skills** (suggested presets or custom). Owners and editors add, rename and archive them; only owners can delete one, which also deletes its ratings. Archived skills keep their history.
+- A **Review** post can rate any active skill from 1 to 5 (Emerging · Beginning · Developing · Proficient · Excelling). Ratings live on the post, so they follow its visibility and editing rights; turning the review into another type drops them.
+- Ratings are members-only: share links and the public page never load them.
+
 ## Comments, email and maintenance
 
 - **Comments/likes**: only signed-in members who can read the post; the owner can delete any comment. Never loaded on share links or the public page.
@@ -101,4 +107,8 @@ src/proxy.ts             session refresh + route protection
 - [x] Week 2: posts (moments/milestones/reviews), photo upload (EXIF stripping + thumbnails), Mux video, timeline (grouped by month, age at the time), edit/delete
 - [x] Week 3: projects, milestones wall, standalone post pages, share links (profile/project/post), custom-address public page
 - [x] Week 4: comments and likes (family members only), account page (storage, data export, account deletion), invitation emails, daily cleanup job, Terms/Privacy drafts, security headers; see [DEPLOY.md](DEPLOY.md) for launch
-- [ ] v1.1: Stripe paid upgrades, structured scores, growth reports, teacher role
+- [ ] v1.1
+  - [x] M1: skills and 1–5 ratings on review posts
+  - [ ] M2: skills tab (radar chart + trends)
+  - [ ] M3: growth reports (print to PDF)
+  - [ ] Teacher role, Stripe paid upgrades

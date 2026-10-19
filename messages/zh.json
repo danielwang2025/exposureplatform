@@ -373,5 +373,58 @@
     "privacy": "隐私政策",
     "terms": "服务条款",
     "updated": "最后更新：{date}"
+  },
+  "skills": {
+    "title": "能力项",
+    "subtitle": "你想持续关注的 {nickname} 的成长方向。在「点评」动态里给它们打分。",
+    "empty": "还没有设置能力项。",
+    "emptyEditor": "还没有能力项。可以从下面的建议里选，也可以自己添加。",
+    "suggested": "建议",
+    "addCustom": "自定义添加",
+    "emoji": "图标",
+    "name": "能力名称",
+    "namePlaceholder": "围棋",
+    "add": "添加",
+    "save": "保存",
+    "cancel": "取消",
+    "rename": "改名",
+    "archive": "归档",
+    "restore": "恢复",
+    "delete": "删除",
+    "archived": "{count} 个已归档能力项",
+    "archivedHint": "归档的能力项会保留以往的评分，但不能再打新分。删除则会连同它的所有评分一起删除。",
+    "archivedBadge": "已归档",
+    "deleteConfirm": "删除「{name}」及它的所有评分？此操作无法撤销。",
+    "limitReached": "已用满 {max} 个能力项。归档一个后才能再添加。",
+    "ratingsTitle": "能力评分",
+    "ratingsHint": "选填。点星星打分，再点一次清除。",
+    "noSkillsYet": "还没有可以打分的能力项。",
+    "setUp": "去设置里添加",
+    "notRated": "未评分",
+    "levels": {
+      "1": "萌芽",
+      "2": "起步",
+      "3": "进步中",
+      "4": "熟练",
+      "5": "出色"
+    },
+    "presets": {
+      "language": "语言表达",
+      "reading": "阅读",
+      "math": "数学",
+      "music": "音乐",
+      "art": "美术",
+      "sports": "运动",
+      "social": "社交",
+      "independence": "自理能力",
+      "focus": "专注力",
+      "curiosity": "好奇心"
+    },
+    "errors": {
+      "name": "请输入 1–40 个字符。",
+      "duplicate": "已经有同名的能力项了。",
+      "tooMany": "每个孩子最多 12 个启用中的能力项，请先归档一个。",
+      "archived": "其中某个能力项已被归档，请刷新后重试。"
+    }
   }
 }

@@ -40,7 +40,11 @@ export type TimelinePost = {
   canEdit: boolean;
   // Members only; shared and public pages never load reactions.
   social?: { likeCount: number; likedByMe: boolean; commentCount: number };
+  // Members only, like reactions: skill ratings on a review, in skill order.
+  ratings?: PostRating[];
 };
+
+export type PostRating = { skillId: string; name: string; emoji: string | null; score: number; archived: boolean };
 
 const SIGNED_URL_SECONDS = 60 * 60;
 
@@ -51,7 +55,8 @@ const postSelect = `
   media ( id, kind, status, position, width, height, storage_path, thumb_path, mux_playback_id, error )
 ` as const;
 
-const memberPostSelect = `${postSelect}, comments ( count ), post_likes ( user_id )` as const;
+const memberPostSelect = `${postSelect}, comments ( count ), post_likes ( user_id ),
+  skill_ratings ( skill_id, score, skills ( name, emoji, position, created_at, archived_at ) )` as const;
 
 export function canEditPost(child: ChildWithRole, authorId: string | null, userId: string) {
   return child.role === "owner" || (atLeast(child.role, "editor") && authorId === userId);
@@ -164,6 +169,11 @@ type PostRow = {
   }>;
   comments?: { count: number }[];
   post_likes?: { user_id: string }[];
+  skill_ratings?: Array<{
+    skill_id: string;
+    score: number;
+    skills: { name: string; emoji: string | null; position: number; created_at: string; archived_at: string | null } | null;
+  }>;
 };
 
 async function toTimelinePosts(
@@ -219,6 +229,7 @@ async function toTimelinePosts(
             commentCount: p.comments[0]?.count ?? 0,
           }
         : undefined,
+    ratings: p.skill_ratings ? toRatings(p.skill_ratings) : undefined,
     media: p.media.map((m) => ({
       id: m.id,
       kind: m.kind,
@@ -232,4 +243,17 @@ async function toTimelinePosts(
       tokens: tokens.get(m.id),
     })),
   }));
+}
+
+function toRatings(rows: NonNullable<PostRow["skill_ratings"]>): PostRating[] {
+  return rows
+    .flatMap((r) => (r.skills ? [{ ...r, skill: r.skills }] : []))
+    .sort((a, b) => a.skill.position - b.skill.position || a.skill.created_at.localeCompare(b.skill.created_at))
+    .map((r) => ({
+      skillId: r.skill_id,
+      name: r.skill.name,
+      emoji: r.skill.emoji,
+      score: r.score,
+      archived: Boolean(r.skill.archived_at),
+    }));
 }

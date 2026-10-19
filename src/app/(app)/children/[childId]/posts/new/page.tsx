@@ -5,6 +5,7 @@ import { Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { atLeast, getChild } from "@/lib/data/children";
 import { listProjects } from "@/lib/data/projects";
+import { listSkills } from "@/lib/data/skills";
 import { isVideoEnabled } from "@/lib/mux";
 import { Composer } from "../composer";
 
@@ -19,7 +20,11 @@ export default async function NewPostPage({ params, searchParams }: PageProps<"/
   const user = await requireUser();
   const child = await getChild(childId, user.id);
   if (!child || !atLeast(child.role, "editor")) notFound();
-  const [t, projects] = await Promise.all([getTranslations("posts"), listProjects(child.id)]);
+  const [t, projects, skills] = await Promise.all([
+    getTranslations("posts"),
+    listProjects(child.id),
+    listSkills(child.id),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -30,6 +35,8 @@ export default async function NewPostPage({ params, searchParams }: PageProps<"/
           maxVisibility={child.max_visibility}
           videoEnabled={isVideoEnabled()}
           projects={projects}
+          skills={skills.filter((s) => !s.archived_at).map((s) => ({ id: s.id, name: s.name, emoji: s.emoji, archived: false }))}
+          canManageSkills
           defaultProjectId={typeof project === "string" && projects.some((p) => p.id === project) ? project : undefined}
         />
       </Card>

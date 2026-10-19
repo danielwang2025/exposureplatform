@@ -29,10 +29,11 @@ type Props =
 
 export async function PostCard(props: Props) {
   const { post } = props;
-  const [t, tv, tc, format] = await Promise.all([
+  const [t, tv, tc, ts, format] = await Promise.all([
     getTranslations("posts"),
     getTranslations("visibility"),
     getTranslations("child"),
+    getTranslations("skills"),
     getFormatter(),
   ]);
   const kindStyle = kindStyles[post.kind];
@@ -100,6 +101,26 @@ export async function PostCard(props: Props) {
 
       {post.title && <h3 className="text-lg font-semibold">{post.title}</h3>}
       {post.body && <p className="whitespace-pre-wrap break-words leading-relaxed">{post.body}</p>}
+      {member && post.ratings && post.ratings.length > 0 && (
+        <ul aria-label={ts("ratingsTitle")} className="flex flex-wrap gap-2">
+          {post.ratings.map((r) => (
+            <li
+              key={r.skillId}
+              title={ts(`levels.${r.score as 1 | 2 | 3 | 4 | 5}`)}
+              className="flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-1 text-xs text-sky-900"
+            >
+              <span>
+                <span aria-hidden>{r.emoji ?? "⭐"}</span> {r.name}
+              </span>
+              <span aria-label={`${r.score}/5`} className="tracking-tight text-amber-500">
+                {"★".repeat(r.score)}
+                <span className="text-sky-200">{"★".repeat(5 - r.score)}</span>
+              </span>
+              <span className="text-sky-700">{ts(`levels.${r.score as 1 | 2 | 3 | 4 | 5}`)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <MediaGallery media={post.media} />
       {member && post.social && (
         <PostSocial

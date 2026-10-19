@@ -39,5 +39,8 @@ and DEPLOY.md for production setup.
   Likely a malformed `NEXT_PUBLIC_SUPABASE_URL`. After changing NEXT_PUBLIC_* vars, redeploy.
 - Before real families: buy a domain → SMTP (Resend) → turn email confirmation back on; fill the
   [bracketed] placeholders in `src/app/(legal)/` and get legal review; Supabase Pro for backups.
-- Next features (v1.1): Stripe paid storage, structured skill scores (radar chart), growth report PDF,
-  teacher role.
+- v1.1 in progress. M1 done locally: `skills` + `skill_ratings` (migration 20261019140949), ratings on
+  review posts, members-only. Next: M2 skills tab (radar + trends, hand-written SVG), M3 growth reports
+  (print CSS → browser "Save as PDF"). Then teacher role; Stripe last.
+- Deploy order for any migration: `npx supabase db push` to production first, then push code (Vercel
+  deploys main on push; code that selects new tables 500s against an old schema).

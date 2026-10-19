@@ -373,5 +373,58 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "updated": "Last updated {date}"
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "What you'd like to follow in {nickname}'s growth. Rate them in Review posts.",
+    "empty": "No skills set up yet.",
+    "emptyEditor": "No skills yet. Pick some suggestions below or add your own.",
+    "suggested": "Suggestions",
+    "addCustom": "Add your own",
+    "emoji": "Icon",
+    "name": "Skill name",
+    "namePlaceholder": "Chess",
+    "add": "Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "rename": "Rename",
+    "archive": "Archive",
+    "restore": "Restore",
+    "delete": "Delete",
+    "archived": "{count, plural, one {# archived skill} other {# archived skills}}",
+    "archivedHint": "Archived skills keep their past ratings but can't be rated again. Deleting one also deletes its ratings.",
+    "archivedBadge": "archived",
+    "deleteConfirm": "Delete “{name}” and every rating it has? This can't be undone.",
+    "limitReached": "You're using all {max} skills. Archive one to add another.",
+    "ratingsTitle": "Skill ratings",
+    "ratingsHint": "Optional. Tap a star to rate, tap it again to clear.",
+    "noSkillsYet": "No skills to rate yet.",
+    "setUp": "Set them up in Settings",
+    "notRated": "Not rated",
+    "levels": {
+      "1": "Emerging",
+      "2": "Beginning",
+      "3": "Developing",
+      "4": "Proficient",
+      "5": "Excelling"
+    },
+    "presets": {
+      "language": "Language",
+      "reading": "Reading",
+      "math": "Math",
+      "music": "Music",
+      "art": "Art",
+      "sports": "Sports",
+      "social": "Social skills",
+      "independence": "Independence",
+      "focus": "Focus",
+      "curiosity": "Curiosity"
+    },
+    "errors": {
+      "name": "Use 1–40 characters.",
+      "duplicate": "There's already a skill with that name.",
+      "tooMany": "A child can have at most 12 active skills. Archive one first.",
+      "archived": "One of these skills was archived. Reload and try again."
+    }
   }
 }

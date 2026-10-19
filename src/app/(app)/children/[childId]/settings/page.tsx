@@ -6,10 +6,12 @@ import { Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { atLeast, getChild, listMembers, listPendingInvitations } from "@/lib/data/children";
 import { listShareLinks } from "@/lib/data/sharing";
+import { listSkills, MAX_ACTIVE_SKILLS } from "@/lib/data/skills";
 import { updateChild } from "../../actions";
 import { ChildForm } from "../../child-form";
 import { DeleteChildForm, InviteForm, LeaveButton, MemberControls, PendingInvitations } from "./members";
 import { PublicAddressForm, ShareLinks } from "./sharing";
+import { SkillsManager } from "./skills";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("child");
@@ -23,12 +25,14 @@ export default async function ChildSettingsPage({ params }: PageProps<"/children
   if (!child) notFound();
 
   const isOwner = child.role === "owner";
-  const [t, tm, tRoles, ts, members, invitations, links] = await Promise.all([
+  const [t, tm, tRoles, ts, tSkills, members, skills, invitations, links] = await Promise.all([
     getTranslations("child"),
     getTranslations("members"),
     getTranslations("roles"),
     getTranslations("sharing"),
+    getTranslations("skills"),
     listMembers(child.id),
+    listSkills(child.id),
     isOwner ? listPendingInvitations(child.id) : Promise.resolve([]),
     isOwner ? listShareLinks(child.id) : Promise.resolve([]),
   ]);
@@ -54,6 +58,22 @@ export default async function ChildSettingsPage({ params }: PageProps<"/children
               birthDate: child.birth_date,
               maxVisibility: child.max_visibility,
             }}
+          />
+        </Card>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">{tSkills("title")}</h2>
+          <p className="text-sm text-muted">{tSkills("subtitle", { nickname: child.nickname })}</p>
+        </div>
+        <Card>
+          <SkillsManager
+            childId={child.id}
+            skills={skills.map((s) => ({ id: s.id, name: s.name, emoji: s.emoji, archived: Boolean(s.archived_at) }))}
+            canEdit={atLeast(child.role, "editor")}
+            canDelete={isOwner}
+            maxActive={MAX_ACTIVE_SKILLS}
           />
         </Card>
       </section>

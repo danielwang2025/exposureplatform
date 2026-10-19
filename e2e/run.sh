@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 set -a; source .env.local; set +a
 
 node e2e/make-fixtures.mjs
-for test in week1-members week2-posts week3-sharing week4-account; do
+for test in week1-members week2-posts week3-sharing week4-account v11-skills; do
   echo "== $test"
   node "e2e/$test.mjs"
 done

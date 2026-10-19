@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createPost, deleteMedia, updatePost, type PostInput } from "@/app/(app)/children/post-actions";
@@ -9,6 +10,7 @@ import { useMessage } from "@/components/use-message";
 import { uploadImage, uploadVideo } from "@/lib/client/upload";
 import type { Visibility } from "@/lib/data/children";
 import type { PostKind, TimelineMedia } from "@/lib/data/posts";
+import { scoreLevels } from "@/lib/skill-presets";
 
 const kinds: { value: PostKind; icon: string }[] = [
   { value: "moment", icon: "📷" },
@@ -33,6 +35,9 @@ type Props = {
   maxVisibility: Visibility;
   videoEnabled: boolean;
   projects: { id: string; title: string; emoji: string | null }[];
+  // Active skills, plus archived ones this post already rates.
+  skills: { id: string; name: string; emoji: string | null; archived: boolean }[];
+  canManageSkills: boolean;
   defaultProjectId?: string;
   post?: {
     id: string;
@@ -43,10 +48,20 @@ type Props = {
     visibility: Visibility;
     projectId: string | null;
     media: TimelineMedia[];
+    ratings: { skillId: string; score: number }[];
   };
 };
 
-export function Composer({ childId, maxVisibility, videoEnabled, projects, defaultProjectId, post }: Props) {
+export function Composer({
+  childId,
+  maxVisibility,
+  videoEnabled,
+  projects,
+  skills,
+  canManageSkills,
+  defaultProjectId,
+  post,
+}: Props) {
   const t = useTranslations("posts");
   const tv = useTranslations("visibility");
   const m = useMessage();
@@ -57,6 +72,9 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
   const allowedVisibilities = visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
 
   const [kind, setKind] = useState<PostKind>(post?.kind ?? "moment");
+  const [ratings, setRatings] = useState<Record<string, number>>(() =>
+    Object.fromEntries((post?.ratings ?? []).map((r) => [r.skillId, r.score])),
+  );
   const [existing, setExisting] = useState(post?.media ?? []);
   const [files, setFiles] = useState<Pending[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -144,6 +162,7 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
       occurredOn: String(form.get("occurredOn") ?? ""),
       visibility: String(form.get("visibility") ?? "family") as Visibility,
       projectId: String(form.get("projectId") ?? ""),
+      ratings: kind === "review" ? ratings : {},
     };
 
     setError(undefined);
@@ -155,6 +174,8 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
       ? await updatePost(childId, postId, input)
       : await createPost(childId, { ...input, hasMedia: files.length > 0 });
     if (!result.ok) {
+      // Saved, but something after (ratings) failed: further submits edit it.
+      if (result.postId) setSavedPostId(result.postId);
       setFieldErrors(result.fieldErrors ?? {});
       setError(result.error);
       setPhase("editing");
@@ -222,6 +243,16 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
             className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </Field>
+
+        {kind === "review" && (
+          <RatingsField
+            childId={childId}
+            skills={skills}
+            canManageSkills={canManageSkills}
+            ratings={ratings}
+            onChange={setRatings}
+          />
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("date")} htmlFor="occurredOn" error={m(fieldErrors.occurredOn)}>
@@ -349,6 +380,85 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
         </div>
       )}
     </form>
+  );
+}
+
+function RatingsField({
+  childId,
+  skills,
+  canManageSkills,
+  ratings,
+  onChange,
+}: {
+  childId: string;
+  skills: Props["skills"];
+  canManageSkills: boolean;
+  ratings: Record<string, number>;
+  onChange: (next: Record<string, number>) => void;
+}) {
+  const t = useTranslations("skills");
+
+  function setScore(skillId: string, score: number | undefined) {
+    const next = { ...ratings };
+    if (score === undefined) delete next[skillId];
+    else next[skillId] = score;
+    onChange(next);
+  }
+
+  return (
+    <fieldset className="space-y-2">
+      <legend className="text-sm font-medium">{t("ratingsTitle")}</legend>
+      {skills.length === 0 ? (
+        <p className="text-sm text-muted">
+          {t("noSkillsYet")}{" "}
+          {canManageSkills && (
+            <Link href={`/children/${childId}/settings`} className="text-primary hover:underline">
+              {t("setUp")}
+            </Link>
+          )}
+        </p>
+      ) : (
+        <>
+          <p className="text-xs text-muted">{t("ratingsHint")}</p>
+          <ul className="divide-y divide-border rounded-xl border border-border">
+            {skills.map((skill) => {
+              const score = ratings[skill.id];
+              return (
+                <li key={skill.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2">
+                  <span className="min-w-0 flex-1 truncate text-sm">
+                    <span aria-hidden>{skill.emoji ?? "⭐"}</span> {skill.name}
+                    {skill.archived && <span className="text-muted"> · {t("archivedBadge")}</span>}
+                  </span>
+                  <span role="radiogroup" aria-label={skill.name} className="flex items-center">
+                    {scoreLevels.map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        role="radio"
+                        aria-checked={score === level}
+                        aria-label={`${level} · ${t(`levels.${level}`)}`}
+                        title={t(`levels.${level}`)}
+                        // Clicking the current score again clears it.
+                        onClick={() => setScore(skill.id, score === level ? undefined : level)}
+                        className={cn(
+                          "px-0.5 text-xl leading-none transition-colors",
+                          score !== undefined && level <= score ? "text-amber-500" : "text-border hover:text-amber-300",
+                        )}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </span>
+                  <span className="w-20 text-right text-xs text-muted">
+                    {score !== undefined ? t(`levels.${score as 1 | 2 | 3 | 4 | 5}`) : t("notRated")}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </fieldset>
   );
 }
 
