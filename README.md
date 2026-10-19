@@ -95,6 +95,7 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - **When Plus ends nothing is deleted.** Each uploader's earliest 2 GB stays visible; later media is *locked*: the storage policy refuses its files, members see a 🔒 tile, share links and the public page omit it. Renewing unlocks everything. The data export always includes all files.
 - Deleting an account cancels its subscription first, and refuses if that fails.
 - Without Stripe keys the Plus section is hidden and video stays available as before. Setup: [DEPLOY.md](DEPLOY.md) §3b.
+- **Local testing with a real sandbox**: put a `sk_test_` key in `.env.local` (any `whsec_…` value works as `STRIPE_WEBHOOK_SECRET` locally), run `node scripts/stripe-setup.mjs` once, pay with card `4242 4242 4242 4242`, then deliver Stripe's events to localhost with `node scripts/stripe-replay-events.mjs` (`--watch` to keep doing it). No Stripe CLI needed.
 
 ## Comments, email and maintenance
 

@@ -40,7 +40,7 @@ Plus stays hidden until `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are set.
 - [ ] Stripe account for your Singapore entity; complete business verification
 - [ ] **Tax → Settings**: turn on Stripe Tax, set your origin address, and add registrations where you're registered (Stripe Tax monitors thresholds and tells you when a new place needs one; registering is up to you)
 - [ ] Create the product and prices: `STRIPE_SECRET_KEY=sk_test_… node scripts/stripe-setup.mjs` ($5.99 / $15.99 / $28.49 / $42.99 for 1 / 3 / 6 / 12 months)
-- [ ] **Settings → Billing → Customer portal**: allow cancelling (at period end), updating payment methods, viewing invoices, and switching between the four Sprout Plus prices
+- [ ] **Settings → Billing → Customer portal**: allow cancelling (at period end), updating payment methods and viewing invoices (the defaults). To let people switch between monthly / 3-month / 6-month / yearly, turn on **Customers can switch plans** and add the Sprout Plus product with its four prices — it's off by default
 - [ ] **Developers → Webhooks**: endpoint `https://<domain>/api/webhooks/stripe` with events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.paused`, `customer.subscription.resumed`; copy the signing secret
 - [ ] Test a checkout with card `4242 4242 4242 4242`, then cancel it in the portal and check the account page
 

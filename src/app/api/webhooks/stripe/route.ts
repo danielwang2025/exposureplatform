@@ -73,6 +73,10 @@ async function syncSubscription(sub: Stripe.Subscription, eventCreated: number, 
   }
 
   const item = sub.items.data[0];
+  // Cancelling in the Customer Portal sets cancel_at (a date) rather than
+  // cancel_at_period_end; either way Plus ends then instead of renewing.
+  const endsAt: number | null = sub.cancel_at || (sub.cancel_at_period_end && item ? item.current_period_end : null) || null;
+  const periodEnd = endsAt ?? item?.current_period_end ?? null;
   const { error } = await admin.from("subscriptions").upsert(
     {
       user_id: userId,
@@ -80,8 +84,9 @@ async function syncSubscription(sub: Stripe.Subscription, eventCreated: number, 
       stripe_subscription_id: sub.id,
       status: sub.status,
       billing_interval: item ? intervalOf(item.price) : null,
-      current_period_end: item ? new Date(item.current_period_end * 1000).toISOString() : null,
-      cancel_at_period_end: sub.cancel_at_period_end,
+      // When Plus renews, or (if cancelled) when it ends.
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      cancel_at_period_end: endsAt !== null,
       last_event_at: eventAt,
     },
     { onConflict: "user_id" },

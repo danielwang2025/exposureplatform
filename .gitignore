@@ -43,3 +43,6 @@ next-env.d.ts
 
 # e2e screenshots and generated fixtures
 /e2e/.output/
+
+# Local Stripe event replay state (scripts/stripe-replay-events.mjs)
+.stripe-events-delivered.json

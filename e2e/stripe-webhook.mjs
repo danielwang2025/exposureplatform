@@ -39,6 +39,7 @@ const subscription = (id, status, interval = { interval: "year", interval_count:
   customer: customerId,
   status,
   cancel_at_period_end: false,
+  cancel_at: null,
   metadata: { user_id: userId },
   items: { object: "list", data: [{ id: `si_${id}`, current_period_end: clock + 365 * 86400, price: { id: "price_x", recurring: interval } }] },
 });
@@ -134,6 +135,16 @@ step("export includes locked photos");
 await hook("customer.subscription.created", subscription("sub_b", "active", { interval: "month", interval_count: 1 }));
 assert((await lockedFlags()) === "false,false,false", "unlocked again");
 assert((await subRow()).billing_interval === "month", "interval updated");
+// Cancelling in the Customer Portal sets cancel_at (not cancel_at_period_end).
+const ending = { ...subscription("sub_b", "active", { interval: "month", interval_count: 1 }), cancel_at: clock + 30 * 86400 };
+await hook("customer.subscription.updated", ending);
+row = await subRow();
+assert(row.cancel_at_period_end === true && row.status === "active", "portal cancel is shown as ending, Plus kept");
+assert(Date.parse(row.current_period_end) === ending.cancel_at * 1000, "end date is the cancel_at date");
+await page.goto(`${BASE}/account`);
+await page.waitForSelector("text=/Monthly · ends on/");
+step("portal cancellation (cancel_at) shows 'ends on' and keeps Plus until then");
+
 // past_due keeps Plus while Stripe retries.
 await hook("customer.subscription.updated", subscription("sub_b", "past_due", { interval: "month", interval_count: 1 }));
 assert((await profile()) === 100 * GiB, "past_due keeps Plus");
