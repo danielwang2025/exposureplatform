@@ -63,7 +63,8 @@ const en: LegalSection[] = [
         <li>Anyone, for posts set to “Public page” when you turn on a public page. Public pages ask search engines not to index them.</li>
         <li>
           Service providers who process data on our behalf: Supabase (database, authentication, file storage), Mux (video),
-          Vercel (hosting) and [email provider]. They may only use it to provide their service to us.
+          Vercel (hosting), Stripe (payments and tax, if you subscribe to Plus; card details go to Stripe, never to us) and
+          [email provider]. They may only use it to provide their service to us.
         </li>
         <li>Authorities, where we are legally required to.</li>
       </ul>
@@ -144,7 +145,7 @@ const zh: LegalSection[] = [
         <li>你邀请的家人，按照你为每条记录设置的角色和可见范围。</li>
         <li>持有你创建的分享链接的人，仅限可见范围为“持链接可见”或更大的记录。</li>
         <li>开启公开主页后，可见范围为“公开主页”的记录对所有人可见。公开主页会要求搜索引擎不要收录。</li>
-        <li>代表我们处理数据的服务商：Supabase（数据库、身份验证、文件存储）、Mux（视频）、Vercel（托管）以及 [邮件服务商]。它们只能将数据用于向我们提供服务。</li>
+        <li>代表我们处理数据的服务商：Supabase（数据库、身份验证、文件存储）、Mux（视频）、Vercel（托管）、Stripe（付款和税费，仅在你订阅 Plus 时；银行卡信息只交给 Stripe，不经过我们）以及 [邮件服务商]。它们只能将数据用于向我们提供服务。</li>
         <li>法律要求时的主管机关。</li>
       </ul>
     ),

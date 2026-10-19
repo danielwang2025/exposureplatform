@@ -22,6 +22,8 @@ export type TimelineMedia = {
   playbackId?: string;
   tokens?: PlaybackTokens;
   error: string | null;
+  // Past the uploader's free 2 GiB while they don't have Plus: kept, not shown.
+  locked: boolean;
 };
 
 export type TimelinePost = {
@@ -52,7 +54,7 @@ const postSelect = `
   id, kind, title, body, occurred_on, visibility, author_id, created_at, project_id,
   profiles ( display_name ),
   projects ( id, title, emoji ),
-  media ( id, kind, status, position, width, height, storage_path, thumb_path, mux_playback_id, error )
+  media ( id, kind, status, position, width, height, storage_path, thumb_path, mux_playback_id, error, locked )
 ` as const;
 
 const memberPostSelect = `${postSelect}, comments ( count ), post_likes ( user_id ),
@@ -139,7 +141,8 @@ export async function listAllowedPosts(
       ...row,
       profiles: null,
       projects: p.project_title ? { title: p.project_title, emoji: p.project_emoji } : null,
-      media: row.media.filter((m) => m.status === "ready"),
+      // Visitors never see locked media, not even as a placeholder.
+      media: row.media.filter((m) => m.status === "ready" && !m.locked),
     }];
   });
 
@@ -169,6 +172,7 @@ type PostRow = {
     thumb_path: string | null;
     mux_playback_id: string | null;
     error: string | null;
+    locked: boolean;
   }>;
   comments?: { count: number }[];
   post_likes?: { user_id: string }[];
@@ -188,8 +192,9 @@ async function toTimelinePosts(
   }: { signer: SupabaseClient<Database>; canEdit: (authorId: string | null) => boolean; userId?: string },
 ): Promise<TimelinePost[]> {
   const allMedia = rows.flatMap((p) => p.media);
-  const readyImages = allMedia.filter((m) => m.kind === "image" && m.status === "ready");
-  const readyVideos = allMedia.filter((m) => m.kind === "video" && m.status === "ready" && m.mux_playback_id);
+  // Locked media is never signed (the storage policy would refuse it anyway).
+  const readyImages = allMedia.filter((m) => m.kind === "image" && m.status === "ready" && !m.locked);
+  const readyVideos = allMedia.filter((m) => m.kind === "video" && m.status === "ready" && m.mux_playback_id && !m.locked);
 
   // For members this is the user's client, so the storage policy re-checks access.
   const paths = readyImages.flatMap((m) => [m.thumb_path!, m.storage_path!]);
@@ -240,6 +245,7 @@ async function toTimelinePosts(
       width: m.width,
       height: m.height,
       error: m.error,
+      locked: m.locked,
       thumbUrl: m.thumb_path ? signed.get(m.thumb_path) : undefined,
       fullUrl: m.storage_path ? signed.get(m.storage_path) : undefined,
       playbackId: m.mux_playback_id ?? undefined,

@@ -25,7 +25,9 @@ export function MediaGallery({ media }: { media: TimelineMedia[] }) {
               single ? "max-h-[32rem]" : "aspect-square",
             )}
           >
-            {item.kind === "video" ? (
+            {item.locked ? (
+              <LockedTile video={item.kind === "video"} />
+            ) : item.kind === "video" ? (
               <VideoTile item={item} />
             ) : item.status === "ready" && item.thumbUrl ? (
               <button
@@ -68,6 +70,20 @@ function VideoTile({ item }: { item: TimelineMedia }) {
       className="size-full"
       style={{ aspectRatio: "16 / 9", height: "100%" }}
     />
+  );
+}
+
+// Past the uploader's free 2 GiB without Plus: kept safe, not shown.
+function LockedTile({ video }: { video: boolean }) {
+  const t = useTranslations("billing");
+  return (
+    <a
+      href="/account#plus"
+      className="flex size-full min-h-32 flex-col items-center justify-center gap-1 p-2 text-center text-xs text-muted hover:text-foreground"
+    >
+      <span aria-hidden className="text-2xl">🔒</span>
+      {video ? t("lockedVideo") : t("lockedPhoto")}
+    </a>
   );
 }
 

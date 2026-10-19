@@ -45,7 +45,7 @@ Locally, email confirmation is off, so you are signed in right after sign-up. Al
 | `npm run typecheck` / `npm run lint` | Type checking / linting |
 | `npm run e2e` | End-to-end flows in a real browser (needs local Supabase + `npm start` on :3000; see `e2e/run.sh`) |
 
-The first time you run the e2e tests, install the browser: `npx playwright install chromium`. `e2e/mux-webhook.mjs` tests the video webhook; it needs a separate instance started with fake Mux variables (see the comments at the top of the file).
+The first time you run the e2e tests, install the browser: `npx playwright install chromium`. `e2e/mux-webhook.mjs` and `e2e/stripe-webhook.mjs` test the video and payment webhooks; each needs a separate instance started with fake Mux or Stripe variables (see the comments at the top of each file).
 
 ## Permission model
 
@@ -88,6 +88,14 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - **Download PDF** opens the browser's print dialog ("Save as PDF"). Print styles hide the site chrome and always print on light paper, even with a dark system theme.
 - Skills, ratings and reports are included in the account's data export.
 
+## Sprout Plus (Stripe)
+
+- **Free**: 2 GB for the photos and videos you upload. **Plus**: 100 GB, video uploads and (coming) AI showcase pages, billed in USD monthly ($5.99), every 3 months (10% off), 6 months (20% off) or yearly (40% off); Stripe Tax adds tax at checkout.
+- Checkout and plan management use Stripe Checkout and the Customer Portal; card details never reach our servers. Plus is granted only by the signed webhook (`/api/webhooks/stripe`), which writes `subscriptions` with the service role and calls `apply_plan` (quota + locks). Out-of-order and unrelated events are ignored; `past_due` keeps Plus while Stripe retries.
+- **When Plus ends nothing is deleted.** Each uploader's earliest 2 GB stays visible; later media is *locked*: the storage policy refuses its files, members see a 🔒 tile, share links and the public page omit it. Renewing unlocks everything. The data export always includes all files.
+- Deleting an account cancels its subscription first, and refuses if that fails.
+- Without Stripe keys the Plus section is hidden and video stays available as before. Setup: [DEPLOY.md](DEPLOY.md) §3b.
+
 ## Comments, email and maintenance
 
 - **Comments/likes**: only signed-in members who can read the post; the owner can delete any comment. Never loaded on share links or the public page.
@@ -122,4 +130,4 @@ src/proxy.ts             session refresh + route protection
   - [x] M2: skills tab (radar chart + trends)
   - [x] M3: growth reports (print to PDF)
   - [x] Teacher role
-  - [ ] Stripe paid upgrades
+  - [x] Stripe: Sprout Plus (test mode; needs keys)

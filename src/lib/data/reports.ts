@@ -53,6 +53,7 @@ export async function listPeriodPhotos(childId: string, start: string, end: stri
     .eq("child_id", childId)
     .eq("kind", "image")
     .eq("status", "ready")
+    .eq("locked", false)
     .gte("posts.occurred_on", start)
     .lte("posts.occurred_on", end)
     // Newest uploads first, capped; then ordered by the post's date below.
@@ -196,7 +197,8 @@ async function loadHighlights(report: Report): Promise<PeriodPhoto[]> {
     .in("id", report.highlight_media_ids)
     .eq("child_id", report.child_id)
     .eq("kind", "image")
-    .eq("status", "ready");
+    .eq("status", "ready")
+    .eq("locked", false);
   if (error) throw error;
   const byId = new Map(data.map((m) => [m.id, m]));
   const ordered = report.highlight_media_ids.flatMap((id) => (byId.has(id) ? [byId.get(id)!] : []));

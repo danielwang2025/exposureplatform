@@ -1,5 +1,6 @@
 import { strToU8, Zip, ZipDeflate, ZipPassThrough } from "fflate";
 import { getCurrentUser } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 // "Download my data" (GDPR access/portability). Streams a ZIP with the
@@ -10,6 +11,10 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
   const supabase = await createClient();
+  // Files are fetched with the admin client so locked media (past the free
+  // 2 GiB without Plus) is still exported; the user client above already
+  // decided which children and media rows this user may export.
+  const files = createAdminClient().storage.from("media");
 
   const [{ data: profile }, { data: memberships }, { data: myComments }] = await Promise.all([
     supabase.from("profiles").select("display_name, created_at, guardian_attested_at, storage_used_bytes").eq("id", user.id).single(),
@@ -111,7 +116,7 @@ export async function GET() {
               continue;
             }
             if (item.status !== "ready" || !item.storage_path) continue;
-            const { data: blob } = await supabase.storage.from("media").download(item.storage_path);
+            const { data: blob } = await files.download(item.storage_path);
             if (!blob) continue;
             const name = `photos/${post.occurred_on}_${post.id.slice(0, 8)}_${index + 1}.jpg`;
             addBinary(`${folder}/${name}`, new Uint8Array(await blob.arrayBuffer()));

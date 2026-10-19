@@ -524,5 +524,44 @@
     },
     "titleField": "Report title",
     "summaryHeading": "Parent's notes"
+  },
+  "billing": {
+    "title": "Sprout Plus",
+    "youHavePlus": "You have Sprout Plus.",
+    "renewsOn": "renews on {date}",
+    "endsOn": "ends on {date}",
+    "pastDue": "Your last payment didn't go through. Update your card to keep Plus.",
+    "manage": "Manage subscription",
+    "benefitStorage": "100 GB for photos and videos (free: 2 GB)",
+    "benefitVideo": "Video uploads",
+    "benefitAi": "AI showcase pages: a unique, interactive page of your child's journey (coming soon, 5 a month)",
+    "benefitKeep": "If you stop, nothing is deleted: your first 2 GB stay visible and everything can still be downloaded.",
+    "chooseInterval": "Billing period",
+    "intervals": {
+      "month": "Monthly",
+      "quarter": "Every 3 months",
+      "half_year": "Every 6 months",
+      "year": "Yearly"
+    },
+    "per": {
+      "month": "month",
+      "quarter": "3 months",
+      "half_year": "6 months",
+      "year": "year"
+    },
+    "save": "Save {percent}%",
+    "subscribe": "Get Plus",
+    "redirecting": "Opening checkout…",
+    "taxNote": "Prices in US dollars. Tax is added at checkout where it applies. Cancel any time; Plus lasts until the end of the period you paid for.",
+    "pricesUnavailable": "Plus isn't available right now. Please try again later.",
+    "checkoutSuccess": "Thank you! Plus will be active within a few seconds.",
+    "checkoutCancelled": "Checkout was cancelled. Nothing was charged.",
+    "lockedNotice": "{count, plural, one {# photo or video is} other {# photos and videos are}} kept safe but hidden because you're past the free 2 GB. Get Plus to show them again, or download all your data below.",
+    "lockedPhoto": "Kept safe · shown with Plus",
+    "lockedVideo": "Video kept safe · shown with Plus",
+    "errors": {
+      "unavailable": "Payments aren't available right now.",
+      "noSubscription": "You don't have a subscription yet."
+    }
   }
 }

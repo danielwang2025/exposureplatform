@@ -129,14 +129,14 @@ isOneToOne: false
                   ]
                 },"media": {
                   Row: {
-                    "bytes": number,"child_id": string,"created_at": string,"duration_seconds": number | null,"error": string | null,"height": number | null,"id": string,"kind": Database["public"]['Enums']["media_kind"],"mux_asset_id": string | null,"mux_playback_id": string | null,"mux_upload_id": string | null,"position": number,"post_id": string,"status": Database["public"]['Enums']["media_status"],"storage_path": string | null,"thumb_path": string | null,"uploader_id": string | null,"width": number | null
+                    "bytes": number,"child_id": string,"created_at": string,"duration_seconds": number | null,"error": string | null,"height": number | null,"id": string,"kind": Database["public"]['Enums']["media_kind"],"locked": boolean,"mux_asset_id": string | null,"mux_playback_id": string | null,"mux_upload_id": string | null,"position": number,"post_id": string,"status": Database["public"]['Enums']["media_status"],"storage_path": string | null,"thumb_path": string | null,"uploader_id": string | null,"width": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "bytes"?: number,"child_id": string,"created_at"?: string,"duration_seconds"?: number | null,"error"?: string | null,"height"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["media_kind"],"mux_asset_id"?: string | null,"mux_playback_id"?: string | null,"mux_upload_id"?: string | null,"position"?: number,"post_id": string,"status"?: Database["public"]['Enums']["media_status"],"storage_path"?: string | null,"thumb_path"?: string | null,"uploader_id"?: string | null,"width"?: number | null
+                    "bytes"?: number,"child_id": string,"created_at"?: string,"duration_seconds"?: number | null,"error"?: string | null,"height"?: number | null,"id"?: string,"kind": Database["public"]['Enums']["media_kind"],"locked"?: boolean,"mux_asset_id"?: string | null,"mux_playback_id"?: string | null,"mux_upload_id"?: string | null,"position"?: number,"post_id": string,"status"?: Database["public"]['Enums']["media_status"],"storage_path"?: string | null,"thumb_path"?: string | null,"uploader_id"?: string | null,"width"?: number | null
                   }
                   Update: {
-                    "bytes"?: number,"child_id"?: string,"created_at"?: string,"duration_seconds"?: number | null,"error"?: string | null,"height"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["media_kind"],"mux_asset_id"?: string | null,"mux_playback_id"?: string | null,"mux_upload_id"?: string | null,"position"?: number,"post_id"?: string,"status"?: Database["public"]['Enums']["media_status"],"storage_path"?: string | null,"thumb_path"?: string | null,"uploader_id"?: string | null,"width"?: number | null
+                    "bytes"?: number,"child_id"?: string,"created_at"?: string,"duration_seconds"?: number | null,"error"?: string | null,"height"?: number | null,"id"?: string,"kind"?: Database["public"]['Enums']["media_kind"],"locked"?: boolean,"mux_asset_id"?: string | null,"mux_playback_id"?: string | null,"mux_upload_id"?: string | null,"position"?: number,"post_id"?: string,"status"?: Database["public"]['Enums']["media_status"],"storage_path"?: string | null,"thumb_path"?: string | null,"uploader_id"?: string | null,"width"?: number | null
                   }
                   Relationships: [
                     {
@@ -367,6 +367,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"subscriptions": {
+                  Row: {
+                    "billing_interval": string | null,"cancel_at_period_end": boolean,"current_period_end": string | null,"last_event_at": string | null,"status": string | null,"stripe_customer_id": string,"stripe_subscription_id": string | null,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "billing_interval"?: string | null,"cancel_at_period_end"?: boolean,"current_period_end"?: string | null,"last_event_at"?: string | null,"status"?: string | null,"stripe_customer_id": string,"stripe_subscription_id"?: string | null,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "billing_interval"?: string | null,"cancel_at_period_end"?: boolean,"current_period_end"?: string | null,"last_event_at"?: string | null,"status"?: string | null,"stripe_customer_id"?: string,"stripe_subscription_id"?: string | null,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "subscriptions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -375,6 +395,9 @@ isOneToOne: false
           Functions: {
             "accept_invitation":
 { Args: { "p_token": string }; Returns: string
+                           },
+"apply_plan":
+{ Args: { "p_user_id": string }; Returns: undefined
                            },
 "can_edit_post":
 { Args: { "p_post_id": string }; Returns: boolean
@@ -401,6 +424,7 @@ isOneToOne: false
 "height": number | null,
 "id": string,
 "kind": Database["public"]['Enums']["media_kind"],
+"locked": boolean,
 "mux_asset_id": string | null,
 "mux_playback_id": string | null,
 "mux_upload_id": string | null,
@@ -432,6 +456,9 @@ isOneToOne: false
 "has_child_role":
 { Args: { "p_child_id": string,"p_min_role": Database["public"]['Enums']["member_role"] }; Returns: boolean
                            },
+"has_plus":
+{ Args: { "p_user_id": string }; Returns: boolean
+                           },
 "public_child":
 { Args: { "p_slug": string }; Returns: {
               "child_age_years": number,"child_nickname": string
@@ -441,6 +468,9 @@ isOneToOne: false
 { Args: { "p_limit"?: number,"p_offset"?: number,"p_slug": string }; Returns: {
               "post_id": string,"project_emoji": string,"project_title": string
             }[]
+                           },
+"refresh_media_locks":
+{ Args: { "p_user_id": string }; Returns: undefined
                            },
 "resolve_share":
 { Args: { "p_token": string }; Returns: {

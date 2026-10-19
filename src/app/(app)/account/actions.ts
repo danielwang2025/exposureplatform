@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { formValues, type FormState } from "@/lib/forms";
 import { listSoleOwnedChildren } from "@/lib/data/account";
 import { purgeMediaFiles } from "@/lib/media-cleanup";
+import { cancelBilling } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -52,6 +53,8 @@ export async function deleteAccount(_prev: FormState, formData: FormData): Promi
   const soleOwned = await listSoleOwnedChildren(user.id);
   const admin = createAdminClient();
   try {
+    // Stop billing first: if this fails, nothing has been deleted yet.
+    await cancelBilling(user.id);
     if (soleOwned.length > 0) {
       const ids = soleOwned.map((c) => c.id);
       const { data: media } = await admin

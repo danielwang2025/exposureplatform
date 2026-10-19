@@ -3,21 +3,33 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { buttonClass, Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { getAccount, listSoleOwnedChildren } from "@/lib/data/account";
+import { getMyPlan } from "@/lib/data/billing";
+import { isBillingEnabled, listPlusPrices } from "@/lib/stripe";
 import { DeleteAccountForm, DisplayNameForm } from "./forms";
+import { PlusSection } from "./plus";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
   return { title: t("title") };
 }
 
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: PageProps<"/account">) {
+  const { billing } = await searchParams;
   const user = await requireUser();
-  const [t, format, account, soleOwned] = await Promise.all([
+  const [t, tb, format, account, soleOwned, plan, prices] = await Promise.all([
     getTranslations("account"),
+    getTranslations("billing"),
     getFormatter(),
     getAccount(user.id),
     listSoleOwnedChildren(user.id),
+    getMyPlan(user.id),
+    // A Stripe hiccup shouldn't break the account page.
+    listPlusPrices().catch((error) => {
+      console.error("listPlusPrices failed", error);
+      return [];
+    }),
   ]);
+  const showPlus = isBillingEnabled() || plan.plus || plan.lockedCount > 0;
   const used = account.storageUsed / account.storageQuota;
   const bytes = (n: number) =>
     n >= 1024 ** 3
@@ -62,6 +74,19 @@ export default async function AccountPage() {
           <p className="text-xs text-muted">{t("storageHint")}</p>
         </Card>
       </section>
+
+      {showPlus && (
+        <section id="plus" className="scroll-mt-20 space-y-3">
+          <h2 className="text-lg font-semibold">{tb("title")}</h2>
+          <Card>
+            <PlusSection
+              plan={plan}
+              prices={prices}
+              flash={billing === "success" || billing === "cancelled" ? billing : undefined}
+            />
+          </Card>
+        </section>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{t("exportTitle")}</h2>

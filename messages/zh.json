@@ -524,5 +524,44 @@
     },
     "titleField": "报告标题",
     "summaryHeading": "家长寄语"
+  },
+  "billing": {
+    "title": "Sprout Plus 会员",
+    "youHavePlus": "你已开通 Sprout Plus。",
+    "renewsOn": "{date} 自动续费",
+    "endsOn": "{date} 到期",
+    "pastDue": "上次扣款没有成功。请更新银行卡，以保留 Plus。",
+    "manage": "管理订阅",
+    "benefitStorage": "100 GB 照片和视频空间（免费版 2 GB）",
+    "benefitVideo": "上传视频",
+    "benefitAi": "AI 成长展示页：为孩子生成独一无二的互动成长页面（即将推出，每月 5 次）",
+    "benefitKeep": "不续费也不会删除任何内容：最早的 2 GB 继续显示，所有数据随时可以下载。",
+    "chooseInterval": "付费周期",
+    "intervals": {
+      "month": "按月",
+      "quarter": "按季度",
+      "half_year": "按半年",
+      "year": "按年"
+    },
+    "per": {
+      "month": "月",
+      "quarter": "3 个月",
+      "half_year": "6 个月",
+      "year": "年"
+    },
+    "save": "省 {percent}%",
+    "subscribe": "开通 Plus",
+    "redirecting": "正在打开付款页…",
+    "taxNote": "以美元计价，结账时按所在地区加收税费。可随时取消，已付费的周期结束前仍可使用 Plus。",
+    "pricesUnavailable": "Plus 暂时无法开通，请稍后再试。",
+    "checkoutSuccess": "谢谢！Plus 将在几秒内生效。",
+    "checkoutCancelled": "已取消付款，没有扣费。",
+    "lockedNotice": "有 {count} 张照片或视频超出了免费的 2 GB，已安全保存但暂不显示。开通 Plus 即可重新显示，也可以在下方下载全部数据。",
+    "lockedPhoto": "已安全保存 · 开通 Plus 后显示",
+    "lockedVideo": "视频已安全保存 · 开通 Plus 后显示",
+    "errors": {
+      "unavailable": "暂时无法付款。",
+      "noSubscription": "你还没有订阅。"
+    }
   }
 }

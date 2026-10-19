@@ -10,7 +10,8 @@ import { isUuid, visibilities } from "@/lib/data/children";
 import { postKinds } from "@/lib/data/posts";
 import { fieldErrorsFrom } from "@/lib/forms";
 import { purgeMediaFiles } from "@/lib/media-cleanup";
-import { getMux, isVideoEnabled } from "@/lib/mux";
+import { canUploadVideo } from "@/lib/data/billing";
+import { getMux } from "@/lib/mux";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -306,9 +307,9 @@ const MAX_VIDEO_BYTES = 1024 * 1024 * 1024;
 // For a video: reserve quota and create a Mux direct upload. Mux reports back
 // through the webhook (src/app/api/webhooks/mux/route.ts).
 export async function startVideoUpload(postId: string, bytes: number): Promise<ActionResult<{ mediaId: string; url: string }>> {
-  await requireUser();
+  const user = await requireUser();
   const mux = getMux();
-  if (!mux || !isVideoEnabled()) return { ok: false, error: "posts.errors.videoDisabled" };
+  if (!mux || !(await canUploadVideo(user.id))) return { ok: false, error: "posts.errors.videoDisabled" };
   if (!isUuid(postId)) return { ok: false, error: "errors.forbidden" };
   if (bytes <= 0 || bytes > MAX_VIDEO_BYTES) return { ok: false, error: "posts.errors.fileTooLarge" };
 

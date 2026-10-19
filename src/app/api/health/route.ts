@@ -115,6 +115,7 @@ export async function GET() {
     NEXT_PUBLIC_SITE_URL: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
     email: Boolean(process.env.SMTP_URL && process.env.EMAIL_FROM),
     video: Boolean(process.env.MUX_TOKEN_ID && process.env.MUX_TOKEN_SECRET),
+    billing: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
   };
 
   const ok = Object.values(checks).every((c) => c.ok);

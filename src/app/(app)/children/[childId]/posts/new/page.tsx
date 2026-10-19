@@ -7,7 +7,7 @@ import { canWriteReviews, getChild } from "@/lib/data/children";
 import { postKinds } from "@/lib/data/posts";
 import { listProjects } from "@/lib/data/projects";
 import { listSkills } from "@/lib/data/skills";
-import { isVideoEnabled } from "@/lib/mux";
+import { canUploadVideo } from "@/lib/data/billing";
 import { Composer } from "../composer";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,7 +35,7 @@ export default async function NewPostPage({ params, searchParams }: PageProps<"/
         <Composer
           childId={child.id}
           maxVisibility={child.max_visibility}
-          videoEnabled={isVideoEnabled()}
+          videoEnabled={await canUploadVideo(user.id)}
           projects={projects}
           skills={skills.filter((s) => !s.archived_at).map((s) => ({ id: s.id, name: s.name, emoji: s.emoji, archived: false }))}
           canManageSkills={!isTeacher}

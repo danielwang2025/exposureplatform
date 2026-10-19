@@ -46,8 +46,25 @@ const en: LegalSection[] = [
     ),
   },
   {
-    heading: "Plans and storage",
-    body: <p>The free plan includes [2 GB] of storage. Paid plans, if offered, will be described before you buy.</p>,
+    heading: "Plans, payment and storage",
+    body: (
+      <ul>
+        <li>The free plan includes 2 GB of storage for photos and videos you upload.</li>
+        <li>
+          Sprout Plus is a subscription billed in US dollars every month, 3 months, 6 months or year, through our payment
+          provider Stripe. Applicable taxes are added at checkout. It renews automatically until you cancel.
+        </li>
+        <li>
+          You can cancel any time from the Account page. Plus continues until the end of the period you paid for; we don’t
+          refund partial periods except where the law requires it. We will tell you in advance before changing the price of
+          your plan.
+        </li>
+        <li>
+          If Plus ends, nothing you posted is deleted. The earliest 2 GB of photos and videos you uploaded stay visible; the
+          rest is kept but hidden until you have Plus again. You can always download all of your data from the Account page.
+        </li>
+      </ul>
+    ),
   },
   {
     heading: "Ending your account",
@@ -115,7 +132,14 @@ const zh: LegalSection[] = [
   },
   {
     heading: "套餐与存储空间",
-    body: <p>免费套餐包含 [2 GB] 存储空间。如提供付费套餐，购买前会说明具体内容。</p>,
+    body: (
+      <ul>
+        <li>免费套餐为你上传的照片和视频提供 2 GB 存储空间。</li>
+        <li>Sprout Plus 是订阅服务，通过支付服务商 Stripe 以美元按月、每 3 个月、每 6 个月或每年收费，结账时按适用规定加收税费。取消前会自动续费。</li>
+        <li>你可以随时在「账号」页面取消。Plus 会持续到已付费周期结束；除法律另有规定外，不退还未使用部分的费用。调整你所订套餐的价格前，我们会提前通知。</li>
+        <li>Plus 结束后，你发布的内容不会被删除：你最早上传的 2 GB 照片和视频继续显示，其余内容会被保留但暂不显示，重新开通 Plus 后即可恢复。你随时可以在「账号」页面下载全部数据。</li>
+      </ul>
+    ),
   },
   {
     heading: "终止账号",

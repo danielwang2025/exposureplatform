@@ -33,6 +33,17 @@ Then, in the Supabase dashboard:
 - [ ] Settings → Webhooks: `https://<domain>/api/webhooks/mux`, then copy the signing secret
 - [ ] Upload one short test video after deploying and confirm it plays
 
+## 3b. Stripe (Sprout Plus)
+
+Plus stays hidden until `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are set. Do all of this in **test mode** first, then repeat in live mode before launch.
+
+- [ ] Stripe account for your Singapore entity; complete business verification
+- [ ] **Tax → Settings**: turn on Stripe Tax, set your origin address, and add registrations where you're registered (Stripe Tax monitors thresholds and tells you when a new place needs one; registering is up to you)
+- [ ] Create the product and prices: `STRIPE_SECRET_KEY=sk_test_… node scripts/stripe-setup.mjs` ($5.99 / $15.99 / $28.49 / $42.99 for 1 / 3 / 6 / 12 months)
+- [ ] **Settings → Billing → Customer portal**: allow cancelling (at period end), updating payment methods, viewing invoices, and switching between the four Sprout Plus prices
+- [ ] **Developers → Webhooks**: endpoint `https://<domain>/api/webhooks/stripe` with events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.paused`, `customer.subscription.resumed`; copy the signing secret
+- [ ] Test a checkout with card `4242 4242 4242 4242`, then cancel it in the portal and check the account page
+
 ## 4. Vercel environment variables (Production)
 
 | Variable | Value |
@@ -47,6 +58,8 @@ Then, in the Supabase dashboard:
 | `MUX_TOKEN_ID`, `MUX_TOKEN_SECRET` | Mux access token |
 | `MUX_WEBHOOK_SECRET` | Mux webhook signing secret |
 | `MUX_SIGNING_KEY_ID`, `MUX_SIGNING_KEY_PRIVATE` | Mux signing key (base64 private key as given) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_…` in production) |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret of the Stripe webhook endpoint (`whsec_…`) |
 
 `vercel.json` schedules `/api/cron/cleanup` daily. Vercel sends `CRON_SECRET` with each call.
 
