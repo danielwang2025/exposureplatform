@@ -40,7 +40,10 @@ export function Comments({
             <li key={c.id} className="rounded-xl bg-surface px-4 py-3 shadow-sm ring-1 ring-border">
               <div className="flex items-baseline gap-2 text-xs text-muted">
                 <span className="font-medium text-foreground">{c.authorName || t("someone")}</span>
-                <time dateTime={c.createdAt}>{format.relativeTime(new Date(c.createdAt), now)}</time>
+                {/* Server and browser clocks can straddle a minute ("now" vs "1 minute ago"). */}
+                <time dateTime={c.createdAt} suppressHydrationWarning>
+                  {format.relativeTime(new Date(c.createdAt), now)}
+                </time>
                 {(c.authorId === userId || isOwner) && (
                   <button
                     type="button"
