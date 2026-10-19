@@ -14,12 +14,56 @@ function variable(name: string, value: string | undefined, pattern?: RegExp, hin
   return { ok: true, detail: "set" };
 }
 
+// Says what's off about a Supabase URL without echoing it.
+function supabaseUrlProblem(value: string): string {
+  if (/^["'].*["']$/.test(value)) return "it is wrapped in quotes; remove them";
+  if (!/^https?:\/\//.test(value)) return "it doesn't start with https://";
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return "it isn't a valid URL";
+  }
+  if (parsed.protocol !== "https:") return "it uses http:// instead of https://";
+  if (!/^[a-z0-9]+\.supabase\.co$/.test(parsed.hostname)) {
+    return parsed.hostname.endsWith("supabase.com")
+      ? "it points at supabase.com (the dashboard), not <project-ref>.supabase.co"
+      : "the host isn't <project-ref>.supabase.co";
+  }
+  if (parsed.pathname !== "/" || parsed.search || parsed.hash) return "it has a path or query after the domain (e.g. /rest/v1); remove it";
+  if (value.endsWith("/")) return "it ends with a slash; remove it";
+  return "unexpected format";
+}
+
 async function probe(url: string, headers: Record<string, string>): Promise<Check> {
   try {
     const res = await fetch(url, { headers, cache: "no-store", signal: AbortSignal.timeout(8000) });
     return { ok: res.ok, detail: `HTTP ${res.status}` };
   } catch (error) {
     return { ok: false, detail: `unreachable (${error instanceof Error ? error.message : "error"})` };
+  }
+}
+
+// Sign-up only works with the Email provider on. Confirmation emails need
+// working SMTP, so flag "confirm email" when the app has no email configured.
+async function emailSignup(url: string, publishable: string): Promise<Check> {
+  try {
+    const res = await fetch(`${url}/auth/v1/settings`, {
+      headers: { apikey: publishable },
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000),
+    });
+    const settings = await res.json();
+    if (settings.disable_signup) return { ok: false, detail: "sign-ups are disabled in Supabase Auth" };
+    if (!settings.external?.email) {
+      return { ok: false, detail: "the Email provider is off (Supabase → Authentication → Sign In / Providers → Email)" };
+    }
+    if (!settings.mailer_autoconfirm) {
+      return { ok: true, detail: "on; new users must confirm their email, so Supabase needs working SMTP" };
+    }
+    return { ok: true, detail: "on; email confirmation is off" };
+  } catch (error) {
+    return { ok: false, detail: `couldn't read auth settings (${error instanceof Error ? error.message : "error"})` };
   }
 }
 
@@ -51,9 +95,13 @@ export async function GET() {
     ),
     CRON_SECRET: variable("CRON_SECRET", process.env.CRON_SECRET),
   };
+  if (url && !checks.NEXT_PUBLIC_SUPABASE_URL.ok && url === url.trim()) {
+    checks.NEXT_PUBLIC_SUPABASE_URL.detail += ` (${supabaseUrlProblem(url)})`;
+  }
 
   if (checks.NEXT_PUBLIC_SUPABASE_URL.ok && checks.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.ok) {
     checks.supabaseAuth = await probe(`${url}/auth/v1/settings`, { apikey: publishable! });
+    if (checks.supabaseAuth.ok) checks.emailSignup = await emailSignup(url!, publishable!);
   }
   if (checks.NEXT_PUBLIC_SUPABASE_URL.ok && checks.SUPABASE_SECRET_KEY.ok) {
     // Also confirms the migrations were pushed (the table exists).
