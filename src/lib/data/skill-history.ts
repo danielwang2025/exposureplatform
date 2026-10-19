@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllPages } from "./paginate";
 import { listSkills, type Skill } from "./skills";
 
 export type SkillPoint = { postId: string; occurredOn: string; createdAt: string; score: number; title: string | null };
@@ -9,14 +10,19 @@ export type SkillSeries = { skill: Skill; points: SkillPoint[] };
 // oldest first. Skills with no visible ratings come back with no points.
 export async function getSkillHistory(childId: string): Promise<SkillSeries[]> {
   const supabase = await createClient();
-  const [skills, { data, error }] = await Promise.all([
+  const [skills, data] = await Promise.all([
     listSkills(childId),
-    supabase
-      .from("skill_ratings")
-      .select("skill_id, score, post_id, posts!inner ( occurred_on, created_at, title )")
-      .eq("child_id", childId),
+    // Years of reviews can pass PostgREST's 1000-row cap.
+    fetchAllPages((from, to) =>
+      supabase
+        .from("skill_ratings")
+        .select("skill_id, score, post_id, posts!inner ( occurred_on, created_at, title )")
+        .eq("child_id", childId)
+        .order("post_id")
+        .order("skill_id")
+        .range(from, to),
+    ),
   ]);
-  if (error) throw error;
 
   const bySkill = new Map<string, SkillPoint[]>();
   for (const row of data) {

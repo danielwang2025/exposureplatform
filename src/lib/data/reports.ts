@@ -3,11 +3,13 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { atLeast, isUuid, type ChildWithRole } from "./children";
+import { fetchAllPages } from "./paginate";
 import type { PostKind } from "./posts";
 import { getSkillHistory, scoreAsOf } from "./skill-history";
 
 export type Report = Database["public"]["Tables"]["reports"]["Row"];
 export const MAX_HIGHLIGHTS = 6;
+const MAX_PICKER_PHOTOS = 120;
 
 const SIGNED_URL_SECONDS = 60 * 60;
 
@@ -52,7 +54,10 @@ export async function listPeriodPhotos(childId: string, start: string, end: stri
     .eq("kind", "image")
     .eq("status", "ready")
     .gte("posts.occurred_on", start)
-    .lte("posts.occurred_on", end);
+    .lte("posts.occurred_on", end)
+    // Newest uploads first, capped; then ordered by the post's date below.
+    .order("created_at", { ascending: false })
+    .limit(MAX_PICKER_PHOTOS);
   if (error) throw error;
   const sorted = data.sort(
     (a, b) =>
@@ -60,7 +65,7 @@ export async function listPeriodPhotos(childId: string, start: string, end: stri
       b.posts.created_at.localeCompare(a.posts.created_at) ||
       a.position - b.position,
   );
-  return signPhotos(sorted.slice(0, 120), false);
+  return signPhotos(sorted, false);
 }
 
 type PhotoRow = {
@@ -117,19 +122,23 @@ function dayBefore(date: string) {
 // (RLS), so a viewer's copy never includes guardian-only posts or ratings.
 export async function buildReport(report: Report): Promise<ReportContent> {
   const supabase = await createClient();
-  const [{ data: posts, error }, history, highlights] = await Promise.all([
-    supabase
-      .from("posts")
-      .select("id, kind, title, body, occurred_on, project_id, projects ( id, title, emoji ), media ( kind, status )")
-      .eq("child_id", report.child_id)
-      .gte("occurred_on", report.period_start)
-      .lte("occurred_on", report.period_end)
-      .order("occurred_on")
-      .order("created_at"),
+  const [posts, history, highlights] = await Promise.all([
+    // A long period can pass PostgREST's 1000-row cap.
+    fetchAllPages((from, to) =>
+      supabase
+        .from("posts")
+        .select("id, kind, title, body, occurred_on, project_id, projects ( id, title, emoji ), media ( kind, status )")
+        .eq("child_id", report.child_id)
+        .gte("occurred_on", report.period_start)
+        .lte("occurred_on", report.period_end)
+        .order("occurred_on")
+        .order("created_at")
+        .order("id")
+        .range(from, to),
+    ),
     getSkillHistory(report.child_id),
     loadHighlights(report),
   ]);
-  if (error) throw error;
 
   const byKind = (kind: PostKind) => posts.filter((p) => p.kind === kind).length;
   const media = posts.flatMap((p) => p.media.filter((m) => m.status === "ready"));
