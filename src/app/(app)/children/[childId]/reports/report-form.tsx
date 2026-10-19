@@ -108,7 +108,11 @@ export function ReportForm({ action, allowFamily, defaults, photos, maxHighlight
       </fieldset>
 
       <Field label={t("visibility")} htmlFor="visibility" hint={t("visibilityHint")}>
-        <Select id="visibility" name="visibility" defaultValue={values?.visibility ?? defaults?.visibility ?? (allowFamily ? "family" : "private")}>
+        <Select
+          id="visibility"
+          name="visibility"
+          defaultValue={allowFamily ? (values?.visibility ?? defaults?.visibility ?? "family") : "private"}
+        >
           <option value="private">{tv("private")}</option>
           {allowFamily && <option value="family">{tv("family")}</option>}
         </Select>

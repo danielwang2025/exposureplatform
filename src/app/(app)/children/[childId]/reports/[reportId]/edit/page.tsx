@@ -44,7 +44,8 @@ export default async function EditReportPage({
       <Card>
         <ReportForm
           action={updateReport.bind(null, child.id, report.id)}
-          allowFamily={child.max_visibility !== "private" || report.visibility === "family"}
+          // If the profile was narrowed to guardians-only, saving lowers the report too.
+          allowFamily={child.max_visibility !== "private"}
           maxHighlights={MAX_HIGHLIGHTS}
           photos={photos}
           defaults={{
