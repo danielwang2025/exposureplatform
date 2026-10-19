@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useNow, useTranslations } from "next-intl";
 import { addComment, deleteComment } from "@/app/(app)/children/comment-actions";
 import { Alert, Button } from "@/components/ui";
 import { useMessage } from "@/components/use-message";
@@ -22,6 +22,7 @@ export function Comments({
 }) {
   const t = useTranslations("comments");
   const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
   const m = useMessage();
   const form = useRef<HTMLFormElement>(null);
   const [pending, startTransition] = useTransition();
@@ -39,7 +40,7 @@ export function Comments({
             <li key={c.id} className="rounded-xl bg-surface px-4 py-3 shadow-sm ring-1 ring-border">
               <div className="flex items-baseline gap-2 text-xs text-muted">
                 <span className="font-medium text-foreground">{c.authorName || t("someone")}</span>
-                <time dateTime={c.createdAt}>{format.relativeTime(new Date(c.createdAt))}</time>
+                <time dateTime={c.createdAt}>{format.relativeTime(new Date(c.createdAt), now)}</time>
                 {(c.authorId === userId || isOwner) && (
                   <button
                     type="button"
