@@ -1,0 +1,38 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { Card } from "@/components/ui";
+import { requireUser } from "@/lib/auth";
+import { atLeast, getChild } from "@/lib/data/children";
+import { listProjects } from "@/lib/data/projects";
+import { isVideoEnabled } from "@/lib/mux";
+import { Composer } from "../composer";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("posts");
+  return { title: t("new") };
+}
+
+export default async function NewPostPage({ params, searchParams }: PageProps<"/children/[childId]/posts/new">) {
+  const { childId } = await params;
+  const { project } = await searchParams;
+  const user = await requireUser();
+  const child = await getChild(childId, user.id);
+  if (!child || !atLeast(child.role, "editor")) notFound();
+  const [t, projects] = await Promise.all([getTranslations("posts"), listProjects(child.id)]);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <h1 className="text-2xl font-semibold">{t("newFor", { nickname: child.nickname })}</h1>
+      <Card>
+        <Composer
+          childId={child.id}
+          maxVisibility={child.max_visibility}
+          videoEnabled={isVideoEnabled()}
+          projects={projects}
+          defaultProjectId={typeof project === "string" && projects.some((p) => p.id === project) ? project : undefined}
+        />
+      </Card>
+    </div>
+  );
+}
