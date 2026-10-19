@@ -43,6 +43,9 @@ Locally, email confirmation is off, so you are signed in right after sign-up. Al
 | `npm run db:test` | Run the database permission tests (pgTAP) |
 | `npm run db:types` | Regenerate `src/lib/supabase/database.types.ts` after changing the schema |
 | `npm run typecheck` / `npm run lint` | Type checking / linting |
+| `npm run e2e` | End-to-end flows in a real browser (needs local Supabase + `npm start` on :3000; see `e2e/run.sh`) |
+
+The first time you run the e2e tests, install the browser: `npx playwright install chromium`. `e2e/mux-webhook.mjs` tests the video webhook; it needs a separate instance started with fake Mux variables (see the comments at the top of the file).
 
 ## Permission model
 
