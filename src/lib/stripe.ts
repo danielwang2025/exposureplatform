@@ -8,7 +8,15 @@ let client: Stripe | null | undefined;
 
 export function getStripe(): Stripe | null {
   if (client !== undefined) return client;
-  client = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+  const key = process.env.STRIPE_SECRET_KEY?.trim();
+  // Real money only from production builds: a live key pasted into a dev
+  // .env.local is ignored rather than used.
+  if (key && /^(sk|rk)_live_/.test(key) && process.env.NODE_ENV !== "production") {
+    console.error("Ignoring a live Stripe key outside production. Use a sk_test_ key for development.");
+    client = null;
+    return client;
+  }
+  client = key ? new Stripe(key) : null;
   return client;
 }
 

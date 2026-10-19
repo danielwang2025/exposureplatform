@@ -8,11 +8,17 @@
 // to it ("transfer lookup key"); existing subscribers keep their price.
 import Stripe from "stripe";
 
-const key = process.env.STRIPE_SECRET_KEY;
+const key = process.env.STRIPE_SECRET_KEY?.trim();
 if (!key) {
   console.error("Set STRIPE_SECRET_KEY");
   process.exit(1);
 }
+const live = /^(sk|rk)_live_/.test(key);
+if (live && !process.argv.includes("--live")) {
+  console.error("This is a LIVE key. Run with --live if you really mean to create live prices.");
+  process.exit(1);
+}
+console.log(`Stripe ${live ? "LIVE" : "test"} mode`);
 const stripe = new Stripe(key);
 
 // US cents. Monthly $5.99; 3 months 10% off, 6 months 20% off, a year 40% off.
