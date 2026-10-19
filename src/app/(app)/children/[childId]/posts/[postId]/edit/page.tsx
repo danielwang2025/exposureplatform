@@ -24,7 +24,7 @@ export default async function EditPostPage({ params }: PageProps<"/children/[chi
   if (!post || !post.canEdit) notFound();
   const [t, projects, skills] = await Promise.all([
     getTranslations("posts"),
-    listProjects(child.id),
+    child.role === "teacher" ? Promise.resolve([]) : listProjects(child.id),
     listSkills(child.id),
   ]);
   const rated = new Set(post.ratings?.map((r) => r.skillId));
@@ -42,6 +42,7 @@ export default async function EditPostPage({ params }: PageProps<"/children/[chi
             .filter((s) => !s.archived_at || rated.has(s.id))
             .map((s) => ({ id: s.id, name: s.name, emoji: s.emoji, archived: Boolean(s.archived_at) }))}
           canManageSkills={atLeast(child.role, "editor")}
+          reviewOnly={child.role === "teacher"}
           post={{
             id: post.id,
             kind: post.kind,

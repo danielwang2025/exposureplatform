@@ -31,6 +31,7 @@ export default async function ChildPage({ params, searchParams }: PageProps<"/ch
     listTimeline(child, user.id, { limit: PAGE_SIZE * pageNumber }),
   ]);
   const canPost = atLeast(child.role, "editor");
+  const isTeacher = child.role === "teacher";
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -40,10 +41,15 @@ export default async function ChildPage({ params, searchParams }: PageProps<"/ch
         <Card className="flex flex-col items-center gap-3 py-12 text-center">
           <span aria-hidden className="text-4xl">📷</span>
           <p className="font-medium">{tp("emptyTitle", { nickname: child.nickname })}</p>
-          <p className="text-sm text-muted">{canPost ? tp("emptyHint") : tp("emptyHintViewer")}</p>
-          {canPost && (
-            <Link href={`/children/${child.id}/posts/new`} className={buttonClass("primary", "mt-2")}>
-              + {tp("first")}
+          <p className="text-sm text-muted">
+            {canPost ? tp("emptyHint") : isTeacher ? tp("emptyHintTeacher", { nickname: child.nickname }) : tp("emptyHintViewer")}
+          </p>
+          {(canPost || isTeacher) && (
+            <Link
+              href={`/children/${child.id}/posts/new${isTeacher ? "?kind=review" : ""}`}
+              className={buttonClass("primary", "mt-2")}
+            >
+              + {isTeacher ? tp("newReview") : tp("first")}
             </Link>
           )}
         </Card>

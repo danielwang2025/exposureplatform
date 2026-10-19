@@ -8,7 +8,7 @@ import { useMessage } from "@/components/use-message";
 import type { MemberRole, PendingInvitation } from "@/lib/data/children";
 import { changeMemberRole, deleteChild, inviteMember, removeMember, revokeInvitation } from "../../actions";
 
-const roles = ["owner", "editor", "viewer"] as const;
+const roles = ["owner", "editor", "teacher", "viewer"] as const;
 
 export function MemberControls({
   childId,
@@ -97,13 +97,18 @@ export function InviteForm({ childId }: { childId: string }) {
         <Field label={t("inviteRole")} htmlFor="invite-role">
           <Select id="invite-role" name="role" defaultValue="viewer">
             <option value="viewer">{tRoles("viewer")}</option>
+            <option value="teacher">{tRoles("teacher")}</option>
             <option value="editor">{tRoles("editor")}</option>
           </Select>
         </Field>
       </div>
-      <p className="text-sm text-muted">
-        {tRoles("viewer")}: {tRoles("viewerHint")} {tRoles("editor")}: {tRoles("editorHint")}
-      </p>
+      <ul className="space-y-1 text-sm text-muted">
+        {(["viewer", "teacher", "editor"] as const).map((r) => (
+          <li key={r}>
+            <span className="font-medium text-foreground">{tRoles(r)}</span>: {tRoles(`${r}Hint`)}
+          </li>
+        ))}
+      </ul>
       <SubmitButton pendingLabel={tAuth("submitting")}>{t("invite")}</SubmitButton>
     </form>
   );

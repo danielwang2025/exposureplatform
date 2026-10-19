@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
-import { atLeast, getChild } from "@/lib/data/children";
+import { canWriteReviews, getChild } from "@/lib/data/children";
 import { postKinds } from "@/lib/data/posts";
 import { listProjects } from "@/lib/data/projects";
 import { listSkills } from "@/lib/data/skills";
@@ -20,10 +20,11 @@ export default async function NewPostPage({ params, searchParams }: PageProps<"/
   const { project, kind } = await searchParams;
   const user = await requireUser();
   const child = await getChild(childId, user.id);
-  if (!child || !atLeast(child.role, "editor")) notFound();
+  if (!child || !canWriteReviews(child.role)) notFound();
+  const isTeacher = child.role === "teacher";
   const [t, projects, skills] = await Promise.all([
     getTranslations("posts"),
-    listProjects(child.id),
+    isTeacher ? Promise.resolve([]) : listProjects(child.id),
     listSkills(child.id),
   ]);
 
@@ -37,7 +38,8 @@ export default async function NewPostPage({ params, searchParams }: PageProps<"/
           videoEnabled={isVideoEnabled()}
           projects={projects}
           skills={skills.filter((s) => !s.archived_at).map((s) => ({ id: s.id, name: s.name, emoji: s.emoji, archived: false }))}
-          canManageSkills
+          canManageSkills={!isTeacher}
+          reviewOnly={isTeacher}
           defaultKind={postKinds.find((k) => k === kind)}
           defaultProjectId={typeof project === "string" && projects.some((p) => p.id === project) ? project : undefined}
         />

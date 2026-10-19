@@ -118,7 +118,7 @@ export async function deleteChild(childId: string, _prev: FormState, formData: F
 
 const inviteSchema = z.object({
   email,
-  role: z.enum(["viewer", "editor"]),
+  role: z.enum(["viewer", "teacher", "editor"]),
 });
 
 export async function inviteMember(childId: string, _prev: FormState, formData: FormData): Promise<FormState> {

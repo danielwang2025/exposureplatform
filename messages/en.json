@@ -134,7 +134,9 @@
     "viewer": "Viewer",
     "ownerHint": "Can manage members and delete the profile.",
     "editorHint": "Can add and edit moments.",
-    "viewerHint": "Can view and comment."
+    "viewerHint": "Can view and comment.",
+    "teacher": "Teacher",
+    "teacherHint": "Writes reviews and rates skills. Sees reviews only — never your other moments, photos or reports."
   },
   "members": {
     "title": "Family & members",
@@ -159,7 +161,7 @@
   },
   "invite": {
     "title": "You're invited",
-    "body": "{inviter} invited you to join {nickname}'s profile on Sprout as {role, select, editor {an editor} other {a viewer}}.",
+    "body": "{inviter} invited you to join {nickname}'s profile on Sprout as {role, select, editor {an editor} teacher {a teacher} other {a viewer}}.",
     "someone": "Someone",
     "sentTo": "This invitation was sent to {email}.",
     "loginToAccept": "Log in to accept",
@@ -239,7 +241,10 @@
     "project": "Project",
     "noProject": "No project",
     "share": "Share",
-    "linkCopied": "Share link copied."
+    "linkCopied": "Share link copied.",
+    "newReview": "New review",
+    "emptyHintTeacher": "Write a review to share how {nickname} is doing. The family will see it.",
+    "teacherVisibilityHint": "Teachers' reviews are shared with the whole family."
   },
   "tabs": {
     "timeline": "Timeline",

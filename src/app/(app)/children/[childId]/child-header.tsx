@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ChildAge, ChildAvatar } from "@/components/child-badge";
 import { buttonClass, cn } from "@/components/ui";
-import { atLeast, type ChildWithRole } from "@/lib/data/children";
+import { canWriteReviews, type ChildWithRole } from "@/lib/data/children";
 
 type Tab = "timeline" | "milestones" | "projects" | "skills" | "reports";
 
@@ -14,13 +14,16 @@ export async function ChildHeader({ child, active }: { child: ChildWithRole; act
     getTranslations("tabs"),
   ]);
   const base = `/children/${child.id}`;
-  const tabs: { key: Tab; href: string }[] = [
+  const isTeacher = child.role === "teacher";
+  const allTabs: { key: Tab; href: string }[] = [
     { key: "timeline", href: base },
     { key: "milestones", href: `${base}/milestones` },
     { key: "projects", href: `${base}/projects` },
     { key: "skills", href: `${base}/skills` },
     { key: "reports", href: `${base}/reports` },
   ];
+  // Teachers only see reviews, so the other tabs would always be empty.
+  const tabs = isTeacher ? allTabs.filter((t) => t.key === "timeline" || t.key === "skills") : allTabs;
 
   return (
     <div className="space-y-4">
@@ -37,9 +40,9 @@ export async function ChildHeader({ child, active }: { child: ChildWithRole; act
           <Link href={`${base}/settings`} className={buttonClass("secondary")}>
             {t("settings")}
           </Link>
-          {atLeast(child.role, "editor") && (
-            <Link href={`${base}/posts/new`} className={buttonClass("primary")}>
-              + {tp("new")}
+          {canWriteReviews(child.role) && (
+            <Link href={`${base}/posts/new${isTeacher ? "?kind=review" : ""}`} className={buttonClass("primary")}>
+              + {isTeacher ? tp("newReview") : tp("new")}
             </Link>
           )}
         </div>

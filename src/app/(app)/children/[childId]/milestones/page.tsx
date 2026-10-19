@@ -18,7 +18,8 @@ export default async function MilestonesPage({ params }: PageProps<"/children/[c
   const { childId } = await params;
   const user = await requireUser();
   const child = await getChild(childId, user.id);
-  if (!child) notFound();
+  // Teachers only see reviews; these pages would always be empty for them.
+  if (!child || child.role === "teacher") notFound();
 
   const [t, tc, format, { posts }] = await Promise.all([
     getTranslations("milestones"),

@@ -42,11 +42,11 @@ export function invitationEmail({
 }: {
   inviter: string;
   nickname: string;
-  role: "viewer" | "editor";
+  role: "viewer" | "teacher" | "editor";
   url: string;
 }) {
-  const roleEn = role === "editor" ? "an editor" : "a viewer";
-  const roleZh = role === "editor" ? "编辑者" : "查看者";
+  const roleEn = { viewer: "a viewer", teacher: "a teacher", editor: "an editor" }[role];
+  const roleZh = { viewer: "查看者", teacher: "老师", editor: "编辑者" }[role];
   const who = inviter || "Someone";
   const subject = `${who} invited you to ${nickname}'s journal on Sprout / ${who} 邀请你查看 ${nickname} 的成长记录`;
   const text = [

@@ -18,7 +18,8 @@ export default async function ReportsPage({ params }: PageProps<"/children/[chil
   const { childId } = await params;
   const user = await requireUser();
   const child = await getChild(childId, user.id);
-  if (!child) notFound();
+  // Teachers only see reviews; these pages would always be empty for them.
+  if (!child || child.role === "teacher") notFound();
 
   const [t, tv, format, reports] = await Promise.all([
     getTranslations("reports"),

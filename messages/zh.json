@@ -134,7 +134,9 @@
     "viewer": "查看者",
     "ownerHint": "可以管理成员、删除档案。",
     "editorHint": "可以添加和编辑记录。",
-    "viewerHint": "可以查看和评论。"
+    "viewerHint": "可以查看和评论。",
+    "teacher": "老师",
+    "teacherHint": "可以写点评、给能力打分。只能看到点评，看不到家里的其他动态、照片和报告。"
   },
   "members": {
     "title": "家人与成员",
@@ -159,7 +161,7 @@
   },
   "invite": {
     "title": "你收到一份邀请",
-    "body": "{inviter} 邀请你以{role, select, editor {编辑者} other {查看者}}身份加入 Sprout 上 {nickname} 的成长档案。",
+    "body": "{inviter} 邀请你以{role, select, editor {编辑者} teacher {老师} other {查看者}}身份加入 Sprout 上 {nickname} 的成长档案。",
     "someone": "有人",
     "sentTo": "此邀请发送给 {email}。",
     "loginToAccept": "登录后接受",
@@ -239,7 +241,10 @@
     "project": "所属项目",
     "noProject": "不属于任何项目",
     "share": "分享",
-    "linkCopied": "分享链接已复制。"
+    "linkCopied": "分享链接已复制。",
+    "newReview": "写点评",
+    "emptyHintTeacher": "写一条点评，说说 {nickname} 最近的表现，家长会看到。",
+    "teacherVisibilityHint": "老师写的点评对所有家人可见。"
   },
   "tabs": {
     "timeline": "时间线",

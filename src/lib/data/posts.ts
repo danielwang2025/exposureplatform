@@ -59,7 +59,10 @@ const memberPostSelect = `${postSelect}, comments ( count ), post_likes ( user_i
   skill_ratings ( skill_id, score, skills ( name, emoji, position, created_at, archived_at ) )` as const;
 
 export function canEditPost(child: ChildWithRole, authorId: string | null, userId: string) {
-  return child.role === "owner" || (atLeast(child.role, "editor") && authorId === userId);
+  if (child.role === "owner") return true;
+  if (authorId !== userId) return false;
+  // Teachers only ever author reviews (enforced by RLS).
+  return atLeast(child.role, "editor") || child.role === "teacher";
 }
 
 type TimelineFilter = { limit: number; kind?: PostKind; projectId?: string; oldestFirst?: boolean };

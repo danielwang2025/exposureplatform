@@ -25,7 +25,8 @@ export default async function ReportPage({ params }: PageProps<"/children/[child
   const { childId, reportId } = await params;
   const user = await requireUser();
   const child = await getChild(childId, user.id);
-  if (!child) notFound();
+  // Teachers only see reviews; these pages would always be empty for them.
+  if (!child || child.role === "teacher") notFound();
   const report = await getReport(child.id, reportId);
   if (!report) notFound();
 

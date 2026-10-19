@@ -463,10 +463,13 @@ isOneToOne: false
                            },
 "shares_child_with":
 { Args: { "p_user_id": string }; Returns: boolean
+                           },
+"teacher_can_read_post":
+{ Args: { "p_child_id": string,"p_kind": Database["public"]['Enums']["post_kind"],"p_visibility": Database["public"]['Enums']["visibility"] }; Returns: boolean
                            }
           }
           Enums: {
-            "media_kind": "image"|"video","media_status": "pending"|"ready"|"failed","member_role": "viewer"|"editor"|"owner","post_kind": "moment"|"milestone"|"review","share_scope": "child"|"project"|"post","visibility": "private"|"family"|"link"|"public"
+            "media_kind": "image"|"video","media_status": "pending"|"ready"|"failed","member_role": "viewer"|"teacher"|"editor"|"owner","post_kind": "moment"|"milestone"|"review","share_scope": "child"|"project"|"post","visibility": "private"|"family"|"link"|"public"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -586,7 +589,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "media_kind": ["image", "video"],"media_status": ["pending", "ready", "failed"],"member_role": ["viewer", "editor", "owner"],"post_kind": ["moment", "milestone", "review"],"share_scope": ["child", "project", "post"],"visibility": ["private", "family", "link", "public"]
+            "media_kind": ["image", "video"],"media_status": ["pending", "ready", "failed"],"member_role": ["viewer", "teacher", "editor", "owner"],"post_kind": ["moment", "milestone", "review"],"share_scope": ["child", "project", "post"],"visibility": ["private", "family", "link", "public"]
           }
         }
 } as const

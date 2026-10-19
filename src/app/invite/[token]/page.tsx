@@ -45,7 +45,7 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
               })}
             </p>
             <p className="text-sm text-muted">
-              {tRoles(invitation.role)}: {tRoles(invitation.role === "editor" ? "editorHint" : "viewerHint")}
+              {tRoles(invitation.role)}: {tRoles(`${invitation.role as "viewer" | "teacher" | "editor"}Hint`)}
             </p>
 
             {!user ? (

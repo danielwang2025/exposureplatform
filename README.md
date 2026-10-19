@@ -52,7 +52,8 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 | Role | Capabilities |
 |---|---|
 | owner | Everything, plus invite and remove members, change roles, delete the child profile |
-| editor | Edit the child profile; later, add and edit posts |
+| editor | Edit the child profile; add and edit posts, projects, skills and reports |
+| teacher | Write Review posts (with ratings and photos) and comment on reviews. Sees reviews and the skill list only: never moments, milestones, projects or reports. Their reviews are always family-visible |
 | viewer | View and comment |
 
 - Each child profile has at least one owner. This is enforced by a database trigger.
@@ -120,4 +121,5 @@ src/proxy.ts             session refresh + route protection
   - [x] M1: skills and 1–5 ratings on review posts
   - [x] M2: skills tab (radar chart + trends)
   - [x] M3: growth reports (print to PDF)
-  - [ ] Teacher role, Stripe paid upgrades
+  - [x] Teacher role
+  - [ ] Stripe paid upgrades

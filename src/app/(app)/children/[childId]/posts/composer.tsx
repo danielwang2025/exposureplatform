@@ -40,6 +40,8 @@ type Props = {
   canManageSkills: boolean;
   defaultProjectId?: string;
   defaultKind?: PostKind;
+  // Teachers: review type only, always family-visible, no project.
+  reviewOnly?: boolean;
   post?: {
     id: string;
     kind: PostKind;
@@ -62,6 +64,7 @@ export function Composer({
   canManageSkills,
   defaultProjectId,
   defaultKind,
+  reviewOnly = false,
   post,
 }: Props) {
   const t = useTranslations("posts");
@@ -71,9 +74,11 @@ export function Composer({
   const fileInput = useRef<HTMLInputElement>(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const allowedVisibilities = visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
+  const allowedVisibilities: Visibility[] = reviewOnly
+    ? ["family"]
+    : visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
 
-  const [kind, setKind] = useState<PostKind>(post?.kind ?? defaultKind ?? "moment");
+  const [kind, setKind] = useState<PostKind>(reviewOnly ? "review" : (post?.kind ?? defaultKind ?? "moment"));
   const [ratings, setRatings] = useState<Record<string, number>>(() =>
     Object.fromEntries((post?.ratings ?? []).map((r) => [r.skillId, r.score])),
   );
@@ -211,7 +216,8 @@ export function Composer({
       {error && <Alert>{m(error)}</Alert>}
 
       <fieldset disabled={busy || phase === "partial"} className="space-y-5">
-        <div role="radiogroup" aria-label={t("kind")} className="grid grid-cols-3 gap-2">
+        {/* Teachers only write reviews, so there's nothing to choose. */}
+        <div role="radiogroup" aria-label={t("kind")} hidden={reviewOnly} className="grid grid-cols-3 gap-2">
           {kinds.map((k) => (
             <button
               key={k.value}
@@ -260,6 +266,14 @@ export function Composer({
           <Field label={t("date")} htmlFor="occurredOn" error={m(fieldErrors.occurredOn)}>
             <Input id="occurredOn" name="occurredOn" type="date" max={today} required defaultValue={post?.occurredOn ?? today} />
           </Field>
+          {reviewOnly ? (
+            <Field label={t("visibility")} htmlFor="visibility" hint={t("teacherVisibilityHint")}>
+              <input type="hidden" name="visibility" value="family" />
+              <p id="visibility" className="flex h-10 items-center text-sm">
+                👪 {tv("family")}
+              </p>
+            </Field>
+          ) : (
           <Field label={t("visibility")} htmlFor="visibility" error={m(fieldErrors.visibility)}>
             <Select
               id="visibility"
@@ -273,9 +287,10 @@ export function Composer({
               ))}
             </Select>
           </Field>
+          )}
         </div>
 
-        {projects.length > 0 && (
+        {!reviewOnly && projects.length > 0 && (
           <Field label={t("project")} htmlFor="projectId">
             <Select id="projectId" name="projectId" defaultValue={post ? (post.projectId ?? "") : (defaultProjectId ?? "")}>
               <option value="">{t("noProject")}</option>

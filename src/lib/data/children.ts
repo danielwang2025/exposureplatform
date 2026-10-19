@@ -9,12 +9,19 @@ export type Visibility = Database["public"]["Enums"]["visibility"];
 export type Child = Database["public"]["Tables"]["children"]["Row"];
 export type ChildWithRole = Child & { role: MemberRole };
 
-export const memberRoles = ["viewer", "editor", "owner"] as const satisfies readonly MemberRole[];
+export const memberRoles = ["viewer", "teacher", "editor", "owner"] as const satisfies readonly MemberRole[];
 export const visibilities = ["private", "family", "link", "public"] as const satisfies readonly Visibility[];
 
-const roleRank: Record<MemberRole, number> = { viewer: 0, editor: 1, owner: 2 };
+// Same order as the database enum. Teachers rank above viewers for "can see the
+// child" checks but only write reviews and only read reviews (see RLS).
+const roleRank: Record<MemberRole, number> = { viewer: 0, teacher: 1, editor: 2, owner: 3 };
 export function atLeast(role: MemberRole, min: MemberRole) {
   return roleRank[role] >= roleRank[min];
+}
+
+// Editors and owners write anything; teachers write reviews.
+export function canWriteReviews(role: MemberRole) {
+  return role === "teacher" || atLeast(role, "editor");
 }
 
 export const isUuid = (value: unknown): value is string => z.uuid().safeParse(value).success;

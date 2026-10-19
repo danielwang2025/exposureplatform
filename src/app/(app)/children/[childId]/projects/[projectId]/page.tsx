@@ -21,7 +21,8 @@ export default async function ProjectPage({ params }: PageProps<"/children/[chil
   const { childId, projectId } = await params;
   const user = await requireUser();
   const child = await getChild(childId, user.id);
-  if (!child) notFound();
+  // Teachers only see reviews; these pages would always be empty for them.
+  if (!child || child.role === "teacher") notFound();
   const project = await getProject(child.id, projectId);
   if (!project) notFound();
 

@@ -7,7 +7,7 @@ import { TrendChart } from "@/components/charts/trend-chart";
 import { Score } from "@/components/score";
 import { buttonClass, Card, cn } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
-import { atLeast, getChild } from "@/lib/data/children";
+import { atLeast, canWriteReviews, getChild } from "@/lib/data/children";
 import { getSkillHistory, isoDate, monthsBefore, scoreAsOf } from "@/lib/data/skill-history";
 import { ChildHeader } from "../child-header";
 
@@ -34,6 +34,7 @@ export default async function SkillsPage({ params, searchParams }: PageProps<"/c
     getSkillHistory(child.id),
   ]);
   const canEdit = atLeast(child.role, "editor");
+  const canReview = canWriteReviews(child.role);
   const base = `/children/${child.id}`;
 
   const rated = history.filter((s) => s.points.length > 0);
@@ -63,7 +64,7 @@ export default async function SkillsPage({ params, searchParams }: PageProps<"/c
           <span aria-hidden className="text-4xl">🌱</span>
           <p className="font-medium">{active.length === 0 ? t("noSkills") : t("noRatings")}</p>
           <p className="max-w-sm text-sm text-muted">{active.length === 0 ? t("noSkillsHint") : t("noRatingsHint")}</p>
-          {canEdit &&
+          {(active.length === 0 ? canEdit : canReview) &&
             (active.length === 0 ? (
               <Link href={`${base}/settings`} className={buttonClass("primary", "mt-2")}>
                 {t("setUpSkills")}
