@@ -244,7 +244,8 @@
   "tabs": {
     "timeline": "Timeline",
     "milestones": "Milestones",
-    "projects": "Projects"
+    "projects": "Projects",
+    "skills": "Skills"
   },
   "milestones": {
     "empty": "No milestones yet",
@@ -426,5 +427,27 @@
       "tooMany": "A child can have at most 12 active skills. Archive one first.",
       "archived": "One of these skills was archived. Reload and try again."
     }
+  },
+  "skillsPage": {
+    "noSkills": "No skills to follow yet",
+    "noSkillsHint": "Pick the skills you want to follow (music, reading, sports…) and rate them in Review posts. Their progress shows up here.",
+    "setUpSkills": "Set up skills",
+    "noRatings": "No ratings yet",
+    "noRatingsHint": "Write a Review post and give a few stars to the skills it's about. Progress builds up here over time.",
+    "writeReview": "Write a review",
+    "compareLabel": "Compare with",
+    "monthsAgo": "{months, plural, one {# month ago} other {# months ago}}",
+    "now": "Now",
+    "radarTitle": "{nickname}'s skills now compared with earlier",
+    "radarNeedsThree": "The skill chart appears once at least 3 skills have ratings.",
+    "tableCaption": "Latest score per skill compared with the earlier date",
+    "skill": "Skill",
+    "change": "Change",
+    "new": "New",
+    "tableHint": "“Now” is the latest rating. The earlier column is the latest rating on or before {date}; “New” means there wasn't one yet.",
+    "trendsTitle": "Over time",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "trendTitle": "{skill} ratings over time",
+    "notRatedYet": "Not rated yet: {skills}"
   }
 }

@@ -244,7 +244,8 @@
   "tabs": {
     "timeline": "时间线",
     "milestones": "里程碑",
-    "projects": "成长项目"
+    "projects": "成长项目",
+    "skills": "能力"
   },
   "milestones": {
     "empty": "还没有里程碑",
@@ -426,5 +427,27 @@
       "tooMany": "每个孩子最多 12 个启用中的能力项，请先归档一个。",
       "archived": "其中某个能力项已被归档，请刷新后重试。"
     }
+  },
+  "skillsPage": {
+    "noSkills": "还没有要关注的能力项",
+    "noSkillsHint": "先选几项想关注的能力（音乐、阅读、运动……），然后在「点评」动态里打分，进步就会显示在这里。",
+    "setUpSkills": "设置能力项",
+    "noRatings": "还没有评分",
+    "noRatingsHint": "写一条「点评」，给相关的能力项打几颗星。积累下来，这里就能看到成长曲线。",
+    "writeReview": "写一条点评",
+    "compareLabel": "对比",
+    "monthsAgo": "{months} 个月前",
+    "now": "现在",
+    "radarTitle": "{nickname} 现在与之前的能力对比",
+    "radarNeedsThree": "至少 3 个能力项有评分后，这里会显示能力雷达图。",
+    "tableCaption": "每项能力的最新评分与之前日期的对比",
+    "skill": "能力",
+    "change": "变化",
+    "new": "新增",
+    "tableHint": "「现在」是最近一次评分；对比列是 {date} 当天或之前的最近一次评分，「新增」表示那时还没有评分。",
+    "trendsTitle": "变化趋势",
+    "reviewCount": "{count} 次点评",
+    "trendTitle": "{skill} 的评分变化",
+    "notRatedYet": "还没评过分：{skills}"
   }
 }

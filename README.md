@@ -77,6 +77,7 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - Each child has up to 12 active **skills** (suggested presets or custom). Owners and editors add, rename and archive them; only owners can delete one, which also deletes its ratings. Archived skills keep their history.
 - A **Review** post can rate any active skill from 1 to 5 (Emerging · Beginning · Developing · Proficient · Excelling). Ratings live on the post, so they follow its visibility and editing rights; turning the review into another type drops them.
 - Ratings are members-only: share links and the public page never load them.
+- The **Skills tab** shows a radar of the latest score per active skill against 3, 6 or 12 months ago, a comparison table, and a trend line per skill whose points link to their reviews. It is built from the ratings the viewer can read, so a private review never shapes what family members see. Charts are plain SVG (`src/components/charts/`), with series colors checked for color-blind safety in light and dark mode.
 
 ## Comments, email and maintenance
 
@@ -109,6 +110,6 @@ src/proxy.ts             session refresh + route protection
 - [x] Week 4: comments and likes (family members only), account page (storage, data export, account deletion), invitation emails, daily cleanup job, Terms/Privacy drafts, security headers; see [DEPLOY.md](DEPLOY.md) for launch
 - [ ] v1.1
   - [x] M1: skills and 1–5 ratings on review posts
-  - [ ] M2: skills tab (radar chart + trends)
+  - [x] M2: skills tab (radar chart + trends)
   - [ ] M3: growth reports (print to PDF)
   - [ ] Teacher role, Stripe paid upgrades

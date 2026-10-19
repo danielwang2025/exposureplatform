@@ -4,7 +4,7 @@ import { ChildAge, ChildAvatar } from "@/components/child-badge";
 import { buttonClass, cn } from "@/components/ui";
 import { atLeast, type ChildWithRole } from "@/lib/data/children";
 
-type Tab = "timeline" | "milestones" | "projects";
+type Tab = "timeline" | "milestones" | "projects" | "skills";
 
 export async function ChildHeader({ child, active }: { child: ChildWithRole; active: Tab }) {
   const [t, tp, tRoles, tTabs] = await Promise.all([
@@ -18,13 +18,15 @@ export async function ChildHeader({ child, active }: { child: ChildWithRole; act
     { key: "timeline", href: base },
     { key: "milestones", href: `${base}/milestones` },
     { key: "projects", href: `${base}/projects` },
+    { key: "skills", href: `${base}/skills` },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
         <ChildAvatar id={child.id} nickname={child.nickname} size="lg" />
-        <div className="min-w-0 flex-1">
+        {/* min width lets the buttons wrap below on phones instead of squeezing the name. */}
+        <div className="min-w-40 flex-1">
           <h1 className="truncate text-2xl font-semibold">{child.nickname}</h1>
           <p className="text-sm text-muted">
             <ChildAge birthDate={child.birth_date} /> · {tRoles(child.role)}

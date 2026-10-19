@@ -11,6 +11,9 @@
   --primary-soft: #e6f4ea;
   --danger: #c53030;
   --danger-soft: #fdecec;
+  /* Chart series, validated for CVD/contrast (dataviz validator): now vs. earlier. */
+  --chart-now: #2f855a;
+  --chart-before: #3b82f6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +28,8 @@
     --primary-soft: #1d3326;
     --danger: #fc8181;
     --danger-soft: #3a1f1f;
+    --chart-now: #38a169;
+    --chart-before: #3b82f6;
   }
 }
 
@@ -39,6 +44,8 @@
   --color-primary-soft: var(--primary-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-chart-now: var(--chart-now);
+  --color-chart-before: var(--chart-before);
   --font-sans: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-mono: var(--font-geist-mono);
 }

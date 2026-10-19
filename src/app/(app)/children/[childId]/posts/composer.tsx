@@ -39,6 +39,7 @@ type Props = {
   skills: { id: string; name: string; emoji: string | null; archived: boolean }[];
   canManageSkills: boolean;
   defaultProjectId?: string;
+  defaultKind?: PostKind;
   post?: {
     id: string;
     kind: PostKind;
@@ -60,6 +61,7 @@ export function Composer({
   skills,
   canManageSkills,
   defaultProjectId,
+  defaultKind,
   post,
 }: Props) {
   const t = useTranslations("posts");
@@ -71,7 +73,7 @@ export function Composer({
   const today = new Date().toISOString().slice(0, 10);
   const allowedVisibilities = visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
 
-  const [kind, setKind] = useState<PostKind>(post?.kind ?? "moment");
+  const [kind, setKind] = useState<PostKind>(post?.kind ?? defaultKind ?? "moment");
   const [ratings, setRatings] = useState<Record<string, number>>(() =>
     Object.fromEntries((post?.ratings ?? []).map((r) => [r.skillId, r.score])),
   );
