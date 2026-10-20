@@ -11,6 +11,11 @@
   --primary-soft: #e6f4ea;
   --danger: #c53030;
   --danger-soft: #fdecec;
+  /* Skill progress chart: one hue, two validated ordinal steps (first → latest). */
+  --viz-first: #86b6ef;
+  --viz-latest: #1c5cab;
+  --viz-grid: #e1e0d9;
+  --delta-up: #006300;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +30,10 @@
     --primary-soft: #1d3326;
     --danger: #fc8181;
     --danger-soft: #3a1f1f;
+    --viz-first: #256abf;
+    --viz-latest: #86b6ef;
+    --viz-grid: #2c2c2a;
+    --delta-up: #0ca30c;
   }
 }
 
@@ -39,6 +48,10 @@
   --color-primary-soft: var(--primary-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-viz-first: var(--viz-first);
+  --color-viz-latest: var(--viz-latest);
+  --color-viz-grid: var(--viz-grid);
+  --color-delta-up: var(--delta-up);
   --font-sans: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-mono: var(--font-geist-mono);
 }

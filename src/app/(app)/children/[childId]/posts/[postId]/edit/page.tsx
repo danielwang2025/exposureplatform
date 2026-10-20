@@ -40,6 +40,7 @@ export default async function EditPostPage({ params }: PageProps<"/children/[chi
             occurredOn: post.occurredOn,
             visibility: post.visibility,
             projectId: post.project?.id ?? null,
+            scores: post.scores,
             media: post.media,
           }}
         />

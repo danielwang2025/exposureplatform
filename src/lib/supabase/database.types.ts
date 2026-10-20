@@ -179,6 +179,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"post_scores": {
+                  Row: {
+                    "child_id": string,"dimension_id": string,"post_id": string,"project_id": string,"score": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "child_id": string,"dimension_id": string,"post_id": string,"project_id": string,"score": number
+                  }
+                  Update: {
+                    "child_id"?: string,"dimension_id"?: string,"post_id"?: string,"project_id"?: string,"score"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_scores_dimension_id_project_id_fkey"
+      columns: ["dimension_id","project_id"]
+isOneToOne: false
+      referencedRelation: "skill_dimensions"
+      referencedColumns: ["id","project_id"]
+    },{
+      foreignKeyName: "post_scores_post_id_child_id_fkey"
+      columns: ["post_id","child_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id","child_id"]
+    }
+                  ]
                 },"posts": {
                   Row: {
                     "author_id": string | null,"body": string,"child_id": string,"created_at": string,"id": string,"kind": Database["public"]['Enums']["post_kind"],"occurred_on": string,"project_id": string | null,"title": string | null,"updated_at": string,"visibility": Database["public"]['Enums']["visibility"]
@@ -289,6 +315,26 @@ isOneToOne: false
       referencedColumns: ["id","child_id"]
     }
                   ]
+                },"skill_dimensions": {
+                  Row: {
+                    "child_id": string,"created_at": string,"id": string,"name": string,"position": number,"project_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "child_id": string,"created_at"?: string,"id"?: string,"name": string,"position"?: number,"project_id": string
+                  }
+                  Update: {
+                    "child_id"?: string,"created_at"?: string,"id"?: string,"name"?: string,"position"?: number,"project_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "skill_dimensions_project_id_child_id_fkey"
+      columns: ["project_id","child_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id","child_id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -368,6 +414,9 @@ isOneToOne: false
                            },
 "set_child_slug":
 { Args: { "p_child_id": string,"p_slug": string }; Returns: string
+                           },
+"set_post_scores":
+{ Args: { "p_post_id": string,"p_scores": Json }; Returns: undefined
                            },
 "settle_media":
 { Args: { "p_bytes": number,"p_duration"?: number,"p_height"?: number,"p_media_id": string,"p_width"?: number }; Returns: undefined

@@ -78,7 +78,8 @@ export async function GET() {
               profiles ( display_name ),
               media ( id, kind, status, position, storage_path, duration_seconds ),
               comments ( body, created_at, profiles ( display_name ) ),
-              post_likes ( user_id )
+              post_likes ( user_id ),
+              post_scores ( score, skill_dimensions ( name ) )
             `)
             .eq("child_id", childId)
             .order("occurred_on", { ascending: true }),
@@ -118,6 +119,7 @@ export async function GET() {
             author: post.profiles?.display_name ?? null,
             photos,
             likes: post.post_likes.length,
+            skillScores: Object.fromEntries(post.post_scores.map((sc) => [sc.skill_dimensions?.name ?? "?", sc.score])),
             comments: post.comments.map((c) => ({ author: c.profiles?.display_name, body: c.body, createdAt: c.created_at })),
           });
         }

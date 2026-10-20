@@ -50,6 +50,8 @@ const postInput = z.object({
     .string()
     .transform((v) => v || null)
     .refine((v) => v === null || isUuid(v), "errors.forbidden"),
+  // Skill id → 1..5. Only reviews in a project carry scores.
+  scores: z.record(z.uuid(), z.number().int().min(1).max(5)).default({}),
 });
 export type PostInput = z.input<typeof postInput>;
 
@@ -89,7 +91,14 @@ export async function createPost(
     .single();
   if (error) return { ok: false, error: dbErrorKey(error) };
 
-  revalidatePath(`/children/${childId}`);
+  const scoreError = await saveScores(data.id, parsed.data);
+  if (scoreError) {
+    // Undo, so resubmitting the form doesn't create a duplicate post.
+    await supabase.from("posts").delete().eq("id", data.id);
+    return { ok: false, error: scoreError };
+  }
+
+  revalidatePath(`/children/${childId}`, "layout");
   return { ok: true, postId: data.id };
 }
 
@@ -116,8 +125,19 @@ export async function updatePost(childId: string, postId: string, input: PostInp
   if (error) return { ok: false, error: dbErrorKey(error) };
   if (data.length === 0) return { ok: false, error: "errors.forbidden" };
 
+  const scoreError = await saveScores(postId, parsed.data);
+  if (scoreError) return { ok: false, error: scoreError };
+
   revalidatePath(`/children/${childId}`, "layout");
   return { ok: true };
+}
+
+// Replaces the post's scores (clears them unless it's a review in a project).
+async function saveScores(postId: string, post: { kind: string; projectId: string | null; scores: Record<string, number> }) {
+  const scores = post.kind === "review" && post.projectId ? post.scores : {};
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_post_scores", { p_post_id: postId, p_scores: scores });
+  return error ? dbErrorKey(error) : null;
 }
 
 export async function deletePost(childId: string, postId: string): Promise<ActionResult> {

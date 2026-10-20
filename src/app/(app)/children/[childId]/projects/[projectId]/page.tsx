@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ShareLinkButton } from "@/components/share-link-button";
+import { ProgressChart } from "@/components/skills/progress-chart";
 import { Timeline } from "@/components/timeline/timeline";
 import { visibilityIcons } from "@/components/timeline/post-card";
 import { buttonClass, Card } from "@/components/ui";
@@ -10,6 +11,7 @@ import { requireUser } from "@/lib/auth";
 import { atLeast, getChild } from "@/lib/data/children";
 import { listTimeline } from "@/lib/data/posts";
 import { getProject } from "@/lib/data/projects";
+import { computeProgress } from "@/lib/progress";
 
 export async function generateMetadata({ params }: PageProps<"/children/[childId]/projects/[projectId]">): Promise<Metadata> {
   const { childId, projectId } = await params;
@@ -33,6 +35,7 @@ export default async function ProjectPage({ params }: PageProps<"/children/[chil
     listTimeline(child, user.id, { limit: 200, projectId: project.id, oldestFirst: true }),
   ]);
   const canEdit = atLeast(child.role, "editor");
+  const progress = computeProgress(posts);
   const base = `/children/${child.id}/projects/${project.id}`;
   const shareable = child.role === "owner" && (project.visibility === "link" || project.visibility === "public");
 
@@ -69,6 +72,8 @@ export default async function ProjectPage({ params }: PageProps<"/children/[chil
         {shareable && <ShareLinkButton childId={child.id} input={{ scope: "project", projectId: project.id }} />}
       </div>
       {child.role === "owner" && !shareable && <p className="text-xs text-muted">{t("shareHint")}</p>}
+
+      {progress && <ProgressChart progress={progress} />}
 
       {posts.length === 0 ? (
         <Card className="py-10 text-center text-sm text-muted">{t("noPosts")}</Card>

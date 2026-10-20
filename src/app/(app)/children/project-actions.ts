@@ -99,3 +99,72 @@ export async function deleteProject(childId: string, projectId: string): Promise
   revalidatePath(`/children/${childId}`, "layout");
   redirect(`/children/${childId}/projects`);
 }
+
+const skillName = z.string().trim().min(1, "skills.errors.nameLength").max(40, "skills.errors.nameLength");
+
+type SkillResult = { ok: true } | { ok: false; error: string };
+
+function skillErrorKey(error: PostgrestError): string {
+  if (error.code === "23505") return "skills.errors.duplicate";
+  if (error.hint === "too_many_skills") return "skills.errors.tooMany";
+  if (error.code === "42501") return "errors.forbidden";
+  return "errors.generic";
+}
+
+export async function addSkill(childId: string, projectId: string, name: string): Promise<SkillResult> {
+  await requireUser();
+  if (!isUuid(childId) || !isUuid(projectId)) return { ok: false, error: "errors.forbidden" };
+  const parsed = skillName.safeParse(name);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("skill_dimensions")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", projectId);
+  const { error } = await supabase
+    .from("skill_dimensions")
+    .insert({ project_id: projectId, child_id: childId, name: parsed.data, position: count ?? 0 });
+  if (error) return { ok: false, error: skillErrorKey(error) };
+
+  revalidatePath(`/children/${childId}`, "layout");
+  return { ok: true };
+}
+
+export async function renameSkill(childId: string, skillId: string, name: string): Promise<SkillResult> {
+  await requireUser();
+  if (!isUuid(childId) || !isUuid(skillId)) return { ok: false, error: "errors.forbidden" };
+  const parsed = skillName.safeParse(name);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("skill_dimensions")
+    .update({ name: parsed.data })
+    .eq("id", skillId)
+    .eq("child_id", childId)
+    .select("id");
+  if (error) return { ok: false, error: skillErrorKey(error) };
+  if (data.length === 0) return { ok: false, error: "errors.forbidden" };
+
+  revalidatePath(`/children/${childId}`, "layout");
+  return { ok: true };
+}
+
+export async function deleteSkill(childId: string, skillId: string): Promise<SkillResult> {
+  await requireUser();
+  if (!isUuid(childId) || !isUuid(skillId)) return { ok: false, error: "errors.forbidden" };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("skill_dimensions")
+    .delete()
+    .eq("id", skillId)
+    .eq("child_id", childId)
+    .select("id");
+  if (error) return { ok: false, error: skillErrorKey(error) };
+  if (data.length === 0) return { ok: false, error: "errors.forbidden" };
+
+  revalidatePath(`/children/${childId}`, "layout");
+  return { ok: true };
+}

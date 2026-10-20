@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { MediaGallery } from "@/components/timeline/media-gallery";
 import { PostActionsMenu } from "@/app/(app)/children/[childId]/post-actions-menu";
+import { ScoreList } from "@/components/skills/score-list";
 import { PostSocial } from "@/components/timeline/post-social";
 import { cn } from "@/components/ui";
 import { ageParts } from "@/lib/age";
@@ -29,10 +30,11 @@ type Props =
 
 export async function PostCard(props: Props) {
   const { post } = props;
-  const [t, tv, tc, format] = await Promise.all([
+  const [t, tv, tc, tSkills, format] = await Promise.all([
     getTranslations("posts"),
     getTranslations("visibility"),
     getTranslations("child"),
+    getTranslations("skills"),
     getFormatter(),
   ]);
   const kindStyle = kindStyles[post.kind];
@@ -100,6 +102,7 @@ export async function PostCard(props: Props) {
 
       {post.title && <h3 className="text-lg font-semibold">{post.title}</h3>}
       {post.body && <p className="whitespace-pre-wrap break-words leading-relaxed">{post.body}</p>}
+      <ScoreList scores={post.scores} label={tSkills("scoresLabel")} />
       <MediaGallery media={post.media} />
       {member && post.social && (
         <PostSocial

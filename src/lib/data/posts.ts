@@ -24,6 +24,8 @@ export type TimelineMedia = {
   error: string | null;
 };
 
+export type PostScore = { dimensionId: string; name: string; position: number; score: number };
+
 export type TimelinePost = {
   id: string;
   kind: PostKind;
@@ -37,6 +39,7 @@ export type TimelinePost = {
   // id is omitted on shared/public pages, where projects aren't browsable.
   project: { id?: string; title: string; emoji: string | null } | null;
   media: TimelineMedia[];
+  scores: PostScore[];
   canEdit: boolean;
   // Members only; shared and public pages never load reactions.
   social?: { likeCount: number; likedByMe: boolean; commentCount: number };
@@ -48,7 +51,8 @@ const postSelect = `
   id, kind, title, body, occurred_on, visibility, author_id, created_at, project_id,
   profiles ( display_name ),
   projects ( id, title, emoji ),
-  media ( id, kind, status, position, width, height, storage_path, thumb_path, mux_playback_id, error )
+  media ( id, kind, status, position, width, height, storage_path, thumb_path, mux_playback_id, error ),
+  post_scores ( score, skill_dimensions ( id, name, position ) )
 ` as const;
 
 const memberPostSelect = `${postSelect}, comments ( count ), post_likes ( user_id )` as const;
@@ -132,6 +136,8 @@ export async function listAllowedPosts(
       profiles: null,
       projects: p.project_title ? { title: p.project_title, emoji: p.project_emoji } : null,
       media: row.media.filter((m) => m.status === "ready"),
+      // Skill names describe the project; show them only where the project itself is shared.
+      post_scores: p.project_title ? row.post_scores : [],
     }];
   });
 
@@ -162,6 +168,7 @@ type PostRow = {
     mux_playback_id: string | null;
     error: string | null;
   }>;
+  post_scores: { score: number; skill_dimensions: { id: string; name: string; position: number } | null }[];
   comments?: { count: number }[];
   post_likes?: { user_id: string }[];
 };
@@ -211,6 +218,13 @@ async function toTimelinePosts(
     createdAt: p.created_at,
     project: p.projects,
     canEdit: canEdit(p.author_id),
+    scores: p.post_scores
+      .flatMap((s) =>
+        s.skill_dimensions
+          ? [{ dimensionId: s.skill_dimensions.id, name: s.skill_dimensions.name, position: s.skill_dimensions.position, score: s.score }]
+          : [],
+      )
+      .sort((a, b) => a.position - b.position || a.name.localeCompare(b.name)),
     social:
       userId && p.post_likes && p.comments
         ? {

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -8,7 +9,9 @@ import { Alert, Button, Field, Input, Select, cn } from "@/components/ui";
 import { useMessage } from "@/components/use-message";
 import { uploadImage, uploadVideo } from "@/lib/client/upload";
 import type { Visibility } from "@/lib/data/children";
-import type { PostKind, TimelineMedia } from "@/lib/data/posts";
+import type { PostKind, PostScore, TimelineMedia } from "@/lib/data/posts";
+import type { SkillDimension } from "@/lib/data/projects";
+import { ScoreInput } from "@/components/skills/score-input";
 
 const kinds: { value: PostKind; icon: string }[] = [
   { value: "moment", icon: "📷" },
@@ -32,7 +35,7 @@ type Props = {
   childId: string;
   maxVisibility: Visibility;
   videoEnabled: boolean;
-  projects: { id: string; title: string; emoji: string | null }[];
+  projects: { id: string; title: string; emoji: string | null; skills: SkillDimension[] }[];
   defaultProjectId?: string;
   post?: {
     id: string;
@@ -42,6 +45,7 @@ type Props = {
     occurredOn: string;
     visibility: Visibility;
     projectId: string | null;
+    scores: PostScore[];
     media: TimelineMedia[];
   };
 };
@@ -49,6 +53,7 @@ type Props = {
 export function Composer({ childId, maxVisibility, videoEnabled, projects, defaultProjectId, post }: Props) {
   const t = useTranslations("posts");
   const tv = useTranslations("visibility");
+  const tSkills = useTranslations("skills");
   const m = useMessage();
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -57,6 +62,11 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
   const allowedVisibilities = visibilityOrder.slice(0, visibilityOrder.indexOf(maxVisibility) + 1);
 
   const [kind, setKind] = useState<PostKind>(post?.kind ?? "moment");
+  const [projectId, setProjectId] = useState(post ? (post.projectId ?? "") : (defaultProjectId ?? ""));
+  const [scores, setScores] = useState<Record<string, number>>(
+    Object.fromEntries((post?.scores ?? []).map((s) => [s.dimensionId, s.score])),
+  );
+  const selectedProject = projects.find((p) => p.id === projectId);
   const [existing, setExisting] = useState(post?.media ?? []);
   const [files, setFiles] = useState<Pending[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -143,7 +153,11 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
       body: String(form.get("body") ?? ""),
       occurredOn: String(form.get("occurredOn") ?? ""),
       visibility: String(form.get("visibility") ?? "family") as Visibility,
-      projectId: String(form.get("projectId") ?? ""),
+      projectId,
+      // Only scores for the selected project's skills are sent.
+      scores: Object.fromEntries(
+        Object.entries(scores).filter(([id]) => selectedProject?.skills.some((s) => s.id === id)),
+      ),
     };
 
     setError(undefined);
@@ -244,7 +258,7 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
 
         {projects.length > 0 && (
           <Field label={t("project")} htmlFor="projectId">
-            <Select id="projectId" name="projectId" defaultValue={post ? (post.projectId ?? "") : (defaultProjectId ?? "")}>
+            <Select id="projectId" name="projectId" value={projectId} onChange={(e) => setProjectId(e.target.value)}>
               <option value="">{t("noProject")}</option>
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -255,6 +269,19 @@ export function Composer({ childId, maxVisibility, videoEnabled, projects, defau
             </Select>
           </Field>
         )}
+
+        {kind === "review" &&
+          selectedProject &&
+          (selectedProject.skills.length > 0 ? (
+            <ScoreInput skills={selectedProject.skills} value={scores} onChange={setScores} />
+          ) : (
+            <p className="rounded-lg bg-background px-3 py-2 text-sm text-muted">
+              {tSkills("noSkillsHint")}{" "}
+              <Link href={`/children/${childId}/projects/${selectedProject.id}/edit`} className="text-primary hover:underline">
+                {tSkills("addSkills")}
+              </Link>
+            </p>
+          ))}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">

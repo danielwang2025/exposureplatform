@@ -4,10 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { atLeast, getChild } from "@/lib/data/children";
-import { getProject } from "@/lib/data/projects";
+import { getProject, listSkills } from "@/lib/data/projects";
 import { updateProject } from "../../../../project-actions";
 import { ProjectForm } from "../../project-form";
 import { DeleteProjectButton } from "./delete-button";
+import { SkillsEditor } from "./skills-editor";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("projects");
@@ -21,7 +22,7 @@ export default async function EditProjectPage({ params }: PageProps<"/children/[
   if (!child || !atLeast(child.role, "editor")) notFound();
   const project = await getProject(child.id, projectId);
   if (!project) notFound();
-  const t = await getTranslations("projects");
+  const [t, skills] = await Promise.all([getTranslations("projects"), listSkills(project.id)]);
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
@@ -37,6 +38,9 @@ export default async function EditProjectPage({ params }: PageProps<"/children/[
             visibility: project.visibility,
           }}
         />
+      </Card>
+      <Card>
+        <SkillsEditor childId={child.id} projectId={project.id} skills={skills} />
       </Card>
       <Card className="space-y-2 border-danger/40">
         <h2 className="font-medium">{t("deleteTitle")}</h2>

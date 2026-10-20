@@ -72,6 +72,13 @@ The first time you run the e2e tests, install the browser: `npx playwright insta
 - Lowering the child's `max_visibility` takes effect immediately: every share link and the public page go dark.
 - `/s/`, `/c/` and `/invite/` respond with `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex`.
 
+## Skill scores
+
+- Each project can define up to 8 **skills** (e.g. Piano: rhythm, sight-reading, expression), managed on the project's edit page.
+- A **Review** post in that project can score each skill 1–5. Scores are part of the post and follow its visibility; moving a post to another project drops its old scores.
+- The project page shows a **Progress** chart: a dumbbell per skill (first vs latest score, one hue in two validated shades), with a hover tooltip and a table view of every scored review. It also appears on a project's share link.
+- On a whole-profile share link or the public page, a post's scores show only when its project is shared at that level too (skill names can be private).
+
 ## Comments, email and maintenance
 
 - **Comments/likes**: only signed-in members who can read the post; the owner can delete any comment. Never loaded on share links or the public page.
@@ -101,4 +108,5 @@ src/proxy.ts             session refresh + route protection
 - [x] Week 2: posts (moments/milestones/reviews), photo upload (EXIF stripping + thumbnails), Mux video, timeline (grouped by month, age at the time), edit/delete
 - [x] Week 3: projects, milestones wall, standalone post pages, share links (profile/project/post), custom-address public page
 - [x] Week 4: comments and likes (family members only), account page (storage, data export, account deletion), invitation emails, daily cleanup job, Terms/Privacy drafts, security headers; see [DEPLOY.md](DEPLOY.md) for launch
-- [ ] v1.1: Stripe paid upgrades, structured scores, growth reports, teacher role
+- [x] v1.1: structured skill scores with a progress chart
+- [ ] Next: growth report PDF, teacher role, Stripe paid storage

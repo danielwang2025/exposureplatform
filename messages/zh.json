@@ -373,5 +373,40 @@
     "privacy": "隐私政策",
     "terms": "服务条款",
     "updated": "最后更新：{date}"
+  },
+  "skills": {
+    "progressTitle": "成长进度",
+    "progressSubtitle": "共 {count} 次点评，首次与最近一次的评分对比（1–5 分）。",
+    "progressSingle": "第一次点评的评分（1–5 分）。再添加一次点评就能看到进步。",
+    "legend": "图例",
+    "first": "首次点评",
+    "latest": "最近点评",
+    "rowSummary": "{name}：首次 {first} 分，最近 {latest} 分（满分 5）",
+    "rowSummarySingle": "{name}：{latest} 分（满分 5）",
+    "reviewCount": "{count} 次点评",
+    "showTable": "以表格查看",
+    "hideTable": "隐藏表格",
+    "tableCaption": "所有评分记录，从早到晚",
+    "date": "日期",
+    "scoresLabel": "能力评分",
+    "scoreTitle": "能力评分",
+    "scoreHint": "为这次评估到的能力打分：1（刚起步）到 5（很熟练）。没评估的留空即可。",
+    "clear": "清除",
+    "noSkillsHint": "这个项目还没有设置评分维度。",
+    "addSkills": "添加维度",
+    "editTitle": "评分维度",
+    "editHint": "最多 8 个，在点评时按 1–5 分打分，例如：节奏、识谱、表现力。",
+    "rename": "重命名 {name}",
+    "delete": "删除",
+    "deleteConfirm": "删除“{name}”及其所有评分吗？",
+    "newSkill": "新维度",
+    "newSkillPlaceholder": "例如：节奏",
+    "add": "添加",
+    "limitReached": "这个项目已有 8 个维度。",
+    "errors": {
+      "nameLength": "请输入 1–40 个字符。",
+      "duplicate": "这个项目已有同名维度。",
+      "tooMany": "每个项目最多 8 个维度。"
+    }
   }
 }

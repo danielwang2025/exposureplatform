@@ -39,5 +39,8 @@ and DEPLOY.md for production setup.
   Likely a malformed `NEXT_PUBLIC_SUPABASE_URL`. After changing NEXT_PUBLIC_* vars, redeploy.
 - Before real families: buy a domain → SMTP (Resend) → turn email confirmation back on; fill the
   [bracketed] placeholders in `src/app/(legal)/` and get legal review; Supabase Pro for backups.
-- Next features (v1.1): Stripe paid storage, structured skill scores (radar chart), growth report PDF,
-  teacher role.
+- v1.1 skill scores built on branch `feature/skill-scores` (migration `20261020120850_skill_scores.sql` must be
+  pushed to production with `npx supabase db push` before that code deploys).
+- Next features: growth report PDF, teacher role, Stripe paid storage.
+- Charts follow the dataviz rules: one hue per measure, validated colours in `globals.css` (`--viz-*`),
+  hover tooltip + table view, no radar charts.

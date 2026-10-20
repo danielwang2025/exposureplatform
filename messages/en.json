@@ -373,5 +373,40 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "updated": "Last updated {date}"
+  },
+  "skills": {
+    "progressTitle": "Progress",
+    "progressSubtitle": "First vs latest score across {count} reviews, on a 1–5 scale.",
+    "progressSingle": "Scores from the first review, on a 1–5 scale. Add another review to see progress.",
+    "legend": "Legend",
+    "first": "First review",
+    "latest": "Latest review",
+    "rowSummary": "{name}: first {first}, latest {latest} out of 5",
+    "rowSummarySingle": "{name}: {latest} out of 5",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "showTable": "Show as table",
+    "hideTable": "Hide table",
+    "tableCaption": "Every scored review, oldest first",
+    "date": "Date",
+    "scoresLabel": "Skill scores",
+    "scoreTitle": "Skill scores",
+    "scoreHint": "Score any skills you assessed this time, 1 (just starting) to 5 (confident). Leave the rest empty.",
+    "clear": "Clear",
+    "noSkillsHint": "This project has no skills to score yet.",
+    "addSkills": "Add skills",
+    "editTitle": "Skills to score",
+    "editHint": "Up to 8 skills you'll score 1–5 in reviews, e.g. rhythm, sight-reading, expression.",
+    "rename": "Rename {name}",
+    "delete": "Delete",
+    "deleteConfirm": "Delete “{name}” and all of its scores?",
+    "newSkill": "New skill",
+    "newSkillPlaceholder": "e.g. Rhythm",
+    "add": "Add",
+    "limitReached": "This project already has 8 skills.",
+    "errors": {
+      "nameLength": "Use 1–40 characters.",
+      "duplicate": "This project already has a skill with that name.",
+      "tooMany": "A project can have at most 8 skills."
+    }
   }
 }

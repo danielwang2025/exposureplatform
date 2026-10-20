@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { ProgressChart } from "@/components/skills/progress-chart";
 import { PostCard } from "@/components/timeline/post-card";
 import { SharedHeader } from "@/components/timeline/shared-header";
 import { Timeline } from "@/components/timeline/timeline";
 import { buttonClass, Card } from "@/components/ui";
 import { getSharedView } from "@/lib/data/sharing";
+import { computeProgress } from "@/lib/progress";
 
 // Don't resolve the token here: resolving counts as a view.
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,6 +25,7 @@ export default async function SharedPage({ params, searchParams }: PageProps<"/s
   const view = await getSharedView(token, pageNumber);
   if (!view) notFound();
   const { share, posts, hasMore } = view;
+  const progress = share.scope === "project" ? computeProgress(posts) : null;
   const t = await getTranslations("shared");
 
   return (
@@ -45,6 +48,8 @@ export default async function SharedPage({ params, searchParams }: PageProps<"/s
           </div>
         </div>
       )}
+
+      {share.scope === "project" && progress && <ProgressChart progress={progress} />}
 
       {posts.length === 0 ? (
         <Card className="py-10 text-center text-sm text-muted">{t("empty")}</Card>
