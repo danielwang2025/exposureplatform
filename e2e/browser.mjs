@@ -19,8 +19,17 @@ export async function launch() {
     return context;
   };
 
+  // Each context looks like a different visitor (the app rate-limits by the
+  // x-forwarded-for IP), unless a test sets its own header.
+  const randomIp = () => `198.18.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`;
   const newContext = browser.newContext.bind(browser);
-  browser.newContext = async (options) => watch(await newContext(options));
+  browser.newContext = async (options = {}) =>
+    watch(
+      await newContext({
+        ...options,
+        extraHTTPHeaders: { "x-forwarded-for": randomIp(), ...options.extraHTTPHeaders },
+      }),
+    );
   browser.newPage = async (options) => {
     const context = await browser.newContext(options);
     return context.newPage();

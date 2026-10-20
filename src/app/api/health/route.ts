@@ -79,6 +79,7 @@ const migrationMarkers: { migration: string; probe: string }[] = [
   // The teacher-role migrations only add an enum value and functions; billing
   // runs after them, so its marker implies they ran too.
   { migration: "20261019151638_billing", probe: "subscriptions?select=*&limit=0" },
+  { migration: "20261020131714_rate_limits", probe: "rate_limits?select=key&limit=0" },
 ];
 
 // Finds the first migration that hasn't been applied to this database.

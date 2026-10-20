@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeNextPath } from "@/lib/auth";
 import { checkbox, email, fieldErrorsFrom, formValues, password, type FormState } from "@/lib/forms";
+import { allowAttempt, allowAttempts, clientIp } from "@/lib/rate-limit";
 import { siteOrigin } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 
@@ -48,6 +49,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     terms: formData.get("terms"),
   });
   if (!parsed.success) return { fieldErrors: fieldErrorsFrom(parsed.error), values };
+  if (!(await allowAttempt("signUpIp", await clientIp()))) return { error: "auth.errors.rateLimited", values };
 
   const next = safeNextPath(formData.get("next"));
   const supabase = await createClient();
@@ -75,6 +77,11 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
     password: formData.get("password"),
   });
   if (!parsed.success) return { fieldErrors: fieldErrorsFrom(parsed.error), values };
+  const allowed = await allowAttempts([
+    ["signInEmail", parsed.data.email],
+    ["signInIp", await clientIp()],
+  ]);
+  if (!allowed) return { error: "auth.errors.rateLimited", values };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
@@ -88,6 +95,11 @@ export async function requestPasswordReset(_prev: FormState, formData: FormData)
   if (!parsed.success) {
     return { fieldErrors: { email: "validation.email" }, values: formValues(formData, ["email"]) };
   }
+  const allowed = await allowAttempts([
+    ["resetEmail", parsed.data],
+    ["resetIp", await clientIp()],
+  ]);
+  if (!allowed) return { error: "auth.errors.rateLimited" };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {

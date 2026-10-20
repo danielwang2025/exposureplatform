@@ -58,7 +58,7 @@
       "emailNotConfirmed": "Please confirm your email address first.",
       "userExists": "An account with this email already exists.",
       "weakPassword": "Please choose a stronger password.",
-      "rateLimited": "Too many attempts. Please wait a minute and try again.",
+      "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
       "sessionMissing": "Your reset link has expired. Please request a new one."
     }
   },
@@ -81,7 +81,8 @@
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "forbidden": "You don't have permission to do that.",
-    "lastOwner": "A child profile needs at least one owner. Make someone else an owner first."
+    "lastOwner": "A child profile needs at least one owner. Make someone else an owner first.",
+    "rateLimited": "Too many attempts. Please wait a few minutes and try again."
   },
   "dashboard": {
     "title": "My children",

@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { formValues, type FormState } from "@/lib/forms";
 import { listSoleOwnedChildren } from "@/lib/data/account";
 import { purgeMediaFiles } from "@/lib/media-cleanup";
+import { allowAttempt } from "@/lib/rate-limit";
 import { cancelBilling } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/env";
@@ -38,6 +39,8 @@ export async function deleteAccount(_prev: FormState, formData: FormData): Promi
   if (confirm !== user.email.toLowerCase()) {
     return { fieldErrors: { confirm: "account.errors.confirmEmail" } };
   }
+  // Limits password guessing through this form.
+  if (!(await allowAttempt("deleteAccount", user.id))) return { error: "errors.rateLimited" };
 
   // Re-check the password with a throwaway client so the session cookie isn't touched.
   const verifier = createPlainClient(supabaseUrl, supabasePublishableKey, {

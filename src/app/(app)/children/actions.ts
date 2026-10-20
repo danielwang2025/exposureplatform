@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { isUuid, memberRoles, visibilities } from "@/lib/data/children";
 import { invitationEmail, sendEmail } from "@/lib/email";
 import { checkbox, email, fieldErrorsFrom, formValues, type FormState } from "@/lib/forms";
+import { allowAttempt } from "@/lib/rate-limit";
 import { siteOrigin } from "@/lib/site";
 import { purgeMediaFiles } from "@/lib/media-cleanup";
 import { createClient } from "@/lib/supabase/server";
@@ -128,6 +129,7 @@ export async function inviteMember(childId: string, _prev: FormState, formData: 
   const parsed = inviteSchema.safeParse({ email: formData.get("email"), role: formData.get("role") });
   if (!parsed.success) return { fieldErrors: fieldErrorsFrom(parsed.error), values };
   if (!isUuid(childId)) return { error: "errors.forbidden", values };
+  if (!(await allowAttempt("invite", user.id))) return { error: "errors.rateLimited", values };
 
   const supabase = await createClient();
   const { data: invitation, error } = await supabase

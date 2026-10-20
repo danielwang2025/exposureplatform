@@ -44,10 +44,14 @@ export async function GET(request: NextRequest) {
   const { count: revokedLinks } = await admin.from("share_links").delete({ count: "exact" }).lt("revoked_at", ago(90));
   const { count: expiredLinks } = await admin.from("share_links").delete({ count: "exact" }).lt("expires_at", ago(90));
 
+  // 4. Rate-limit counters: the longest window is a day.
+  const { count: rateLimits } = await admin.from("rate_limits").delete({ count: "exact" }).lt("window_start", ago(2));
+
   const summary = {
     abandonedUploads: abandoned.length,
     invitations: invitations ?? 0,
     shareLinks: (revokedLinks ?? 0) + (expiredLinks ?? 0),
+    rateLimits: rateLimits ?? 0,
   };
   console.log("cleanup", summary);
   return Response.json(summary);

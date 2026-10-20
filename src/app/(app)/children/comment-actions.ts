@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { isUuid } from "@/lib/data/children";
+import { allowAttempt } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 type Result = { ok: true } | { ok: false; error: string };
@@ -15,6 +16,7 @@ export async function addComment(childId: string, postId: string, body: string):
   if (!isUuid(childId) || !isUuid(postId)) return { ok: false, error: "errors.forbidden" };
   const parsed = commentBody.safeParse(body);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  if (!(await allowAttempt("comment", user.id))) return { ok: false, error: "errors.rateLimited" };
 
   const supabase = await createClient();
   const { error } = await supabase

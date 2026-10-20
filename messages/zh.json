@@ -58,7 +58,7 @@
       "emailNotConfirmed": "请先确认你的邮箱地址。",
       "userExists": "该邮箱已注册。",
       "weakPassword": "密码强度不够，请换一个。",
-      "rateLimited": "尝试次数过多，请稍等一分钟再试。",
+      "rateLimited": "尝试次数过多，请过几分钟再试。",
       "sessionMissing": "重置链接已过期，请重新申请。"
     }
   },
@@ -81,7 +81,8 @@
   "errors": {
     "generic": "出了点问题，请重试。",
     "forbidden": "你没有执行此操作的权限。",
-    "lastOwner": "每个孩子档案至少需要一位所有者，请先把其他人设为所有者。"
+    "lastOwner": "每个孩子档案至少需要一位所有者，请先把其他人设为所有者。",
+    "rateLimited": "操作太频繁了，请过几分钟再试。"
   },
   "dashboard": {
     "title": "我的孩子",
