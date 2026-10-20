@@ -67,6 +67,38 @@ async function emailSignup(url: string, publishable: string): Promise<Check> {
   }
 }
 
+// One object per migration, oldest first, that only exists once that migration
+// has run. Keep this in step with supabase/migrations/ when adding one.
+const migrationMarkers: { migration: string; probe: string }[] = [
+  { migration: "20261019105910_init_profiles_children_members", probe: "profiles?select=id&limit=0" },
+  { migration: "20261019111429_posts_and_media", probe: "media?select=id&limit=0" },
+  { migration: "20261019113110_projects_sharing", probe: "share_links?select=id&limit=0" },
+  { migration: "20261019114931_comments_likes", probe: "post_likes?select=post_id&limit=0" },
+  { migration: "20261019140949_skills_ratings", probe: "skill_ratings?select=*&limit=0" },
+  { migration: "20261019143630_reports", probe: "reports?select=*&limit=0" },
+  // The teacher-role migrations only add an enum value and functions; billing
+  // runs after them, so its marker implies they ran too.
+  { migration: "20261019151638_billing", probe: "subscriptions?select=*&limit=0" },
+];
+
+// Finds the first migration that hasn't been applied to this database.
+async function migrations(url: string, secret: string): Promise<Check> {
+  const headers = { apikey: secret, authorization: `Bearer ${secret}` };
+  for (const marker of migrationMarkers) {
+    const result = await probe(`${url}/rest/v1/${marker.probe}`, headers);
+    if (!result.ok) {
+      return {
+        ok: false,
+        detail:
+          result.detail === "HTTP 404"
+            ? `database is missing migrations from ${marker.migration} on. Run \`npx supabase db push\` from the project folder.`
+            : `couldn't check ${marker.migration} (${result.detail})`,
+      };
+    }
+  }
+  return { ok: true, detail: `all ${migrationMarkers.length} checked migrations applied` };
+}
+
 export async function GET() {
   // Referenced literally so we see the values baked in at build time, which
   // is what the pages use. If these are missing, redeploy after setting them.
@@ -104,11 +136,11 @@ export async function GET() {
     if (checks.supabaseAuth.ok) checks.emailSignup = await emailSignup(url!, publishable!);
   }
   if (checks.NEXT_PUBLIC_SUPABASE_URL.ok && checks.SUPABASE_SECRET_KEY.ok) {
-    // Also confirms the migrations were pushed (the table exists).
     checks.supabaseDatabase = await probe(`${url}/rest/v1/profiles?select=id&limit=1`, {
       apikey: secret!,
       authorization: `Bearer ${secret}`,
     });
+    if (checks.supabaseDatabase.ok) checks.databaseMigrations = await migrations(url!, secret!);
   }
 
   const optional = {

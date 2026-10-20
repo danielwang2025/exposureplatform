@@ -46,3 +46,6 @@ and DEPLOY.md for production setup.
   test keys before checkout can be tested end to end. Next big feature: AI showcase pages for Plus.
 - Deploy order for any migration: `npx supabase db push` to production first, then push code (Vercel
   deploys main on push; code that selects new tables 500s against an old schema).
+
+- When adding a migration that creates a table, add a marker for it in `migrationMarkers` in
+  `src/app/api/health/route.ts`, so `/api/health` can tell when production is missing it.
