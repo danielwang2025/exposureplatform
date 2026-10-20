@@ -564,5 +564,12 @@
       "unavailable": "Payments aren't available right now.",
       "noSubscription": "You don't have a subscription yet."
     }
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "This page couldn't load. It's not your fault — please try again. If it keeps happening, send us the error ID below.",
+    "errorId": "Error ID",
+    "retry": "Try again",
+    "home": "Go to home page"
   }
 }

@@ -2,13 +2,14 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "./database.types";
-import { supabasePublishableKey, supabaseUrl } from "./env";
+import { serverFetch, supabasePublishableKey, supabaseUrl } from "./env";
 
 // Create a new client per request; never share one across requests.
 export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(supabaseUrl, supabasePublishableKey, {
+    global: { fetch: serverFetch },
     cookies: {
       getAll() {
         return cookieStore.getAll();

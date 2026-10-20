@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "./database.types";
-import { supabasePublishableKey, supabaseUrl } from "./env";
+import { serverFetch, supabasePublishableKey, supabaseUrl } from "./env";
 
 // Paths that require a signed-in user. Everything else (landing page, auth
 // pages, invitation previews, and later public/shared pages) is open.
@@ -18,6 +18,7 @@ export async function updateSession(request: NextRequest, extraRequestHeaders: R
   let response = next();
 
   const supabase = createServerClient<Database>(supabaseUrl, supabasePublishableKey, {
+    global: { fetch: serverFetch },
     cookies: {
       getAll() {
         return request.cookies.getAll();
