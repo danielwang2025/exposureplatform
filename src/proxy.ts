@@ -1,15 +1,26 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { contentSecurityPolicy } from "@/lib/csp";
 import { updateSession } from "@/lib/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = contentSecurityPolicy(nonce);
+
+  let response: NextResponse;
   try {
-    return await updateSession(request);
+    // Next.js reads the CSP from the request headers to nonce its own scripts.
+    response = await updateSession(request, { "x-nonce": nonce, "Content-Security-Policy": csp });
   } catch (error) {
     // Most likely missing configuration. Let the request through so that
     // /api/health can still explain what's wrong; pages fail on their own.
     console.error("proxy: session refresh failed", error);
-    return NextResponse.next({ request });
+    const headers = new Headers(request.headers);
+    headers.set("x-nonce", nonce);
+    headers.set("Content-Security-Policy", csp);
+    response = NextResponse.next({ request: { headers } });
   }
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
 }
 
 export const config = {

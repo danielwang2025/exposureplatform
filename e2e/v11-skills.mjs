@@ -1,5 +1,5 @@
 // v1.1 end-to-end: skills in settings, ratings on review posts, who sees them.
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SHOTS = new URL("./.output/shots/", import.meta.url).pathname;
@@ -11,7 +11,7 @@ const PASSWORD = "correct-horse-1";
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 
 async function signup(page, user, next) {
   await page.goto(`${BASE}/signup${next ? `?next=${encodeURIComponent(next)}&email=${encodeURIComponent(user.email)}` : ""}`);

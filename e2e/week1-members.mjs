@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SHOTS = new URL("./.output/shots/", import.meta.url).pathname;
@@ -7,7 +7,7 @@ const alice = { name: "Alice", email: `alice${run}@example.com` };
 const bob = { name: "Bob", email: `bob${run}@example.com` };
 const PASSWORD = "correct-horse-1";
 
-const browser = await chromium.launch();
+const browser = await launch();
 const step = (msg) => console.log("✓", msg);
 
 async function signup(page, user, next) {

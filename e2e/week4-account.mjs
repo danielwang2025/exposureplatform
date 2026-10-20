@@ -1,6 +1,6 @@
 // Week 4 end-to-end: invitation email, likes & comments, export, cleanup cron,
 // account deletion, legal pages, security headers.
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { createClient } = require("@supabase/supabase-js");
@@ -18,7 +18,7 @@ const val = { name: "Grandma Val", email: `val${run}@example.com` };
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 async function signup(page, user, next) {
   await page.goto(`${BASE}/signup${next ? `?next=${encodeURIComponent(next)}&email=${encodeURIComponent(user.email)}` : ""}`);
   await page.fill("#displayName", user.name);

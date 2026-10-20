@@ -7,7 +7,7 @@
 //   npm run build
 //   STRIPE_SECRET_KEY=sk_test_fake STRIPE_WEBHOOK_SECRET=whsec_e2e npx next start -p 3001
 // then: set -a; source .env.local; set +a; node e2e/stripe-webhook.mjs
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -91,7 +91,7 @@ assert((await subRow()).status === "active", "other subscription's end ignored")
 step("out-of-order and unrelated events are ignored");
 
 // Account page and timeline with Plus.
-const browser = await chromium.launch();
+const browser = await launch();
 const page = await (await browser.newContext({ viewport: { width: 1100, height: 900 } })).newPage();
 page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 await page.goto(`${BASE}/login`);

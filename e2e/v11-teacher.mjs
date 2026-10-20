@@ -1,6 +1,6 @@
 // v1.1 end-to-end: the teacher role — invited by email, writes reviews with
 // ratings, sees only reviews, can't reach the family's other content.
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SP = new URL("./.output/", import.meta.url).pathname;
@@ -14,7 +14,7 @@ const PASSWORD = "correct-horse-1";
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 
 async function signup(page, user, next) {
   await page.goto(`${BASE}/signup${next ? `?next=${encodeURIComponent(next)}&email=${encodeURIComponent(user.email)}` : ""}`);

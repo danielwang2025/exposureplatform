@@ -1,5 +1,5 @@
 // Week 2 end-to-end: posts, photo uploads, metadata stripping, visibility, edit/delete.
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { createClient } = require("@supabase/supabase-js");
@@ -18,7 +18,7 @@ const PASSWORD = "correct-horse-1";
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 
 async function signup(page, user, next) {
   await page.goto(`${BASE}/signup${next ? `?next=${encodeURIComponent(next)}&email=${encodeURIComponent(user.email)}` : ""}`);

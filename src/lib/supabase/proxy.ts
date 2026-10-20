@@ -7,8 +7,15 @@ import { supabasePublishableKey, supabaseUrl } from "./env";
 // pages, invitation previews, and later public/shared pages) is open.
 const protectedPrefixes = ["/dashboard", "/children", "/account"];
 
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+// `extraRequestHeaders` are passed on to the page render (e.g. the CSP nonce).
+export async function updateSession(request: NextRequest, extraRequestHeaders: Record<string, string> = {}) {
+  // Rebuilt after cookies change, so the page sees the refreshed session too.
+  const next = () => {
+    const headers = new Headers(request.headers);
+    Object.entries(extraRequestHeaders).forEach(([key, value]) => headers.set(key, value));
+    return NextResponse.next({ request: { headers } });
+  };
+  let response = next();
 
   const supabase = createServerClient<Database>(supabaseUrl, supabasePublishableKey, {
     cookies: {
@@ -17,7 +24,7 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = next();
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );

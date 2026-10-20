@@ -1,5 +1,5 @@
 // Week 3 end-to-end: projects, milestones wall, share links, public page.
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SP = new URL("./.output/", import.meta.url).pathname;
@@ -10,7 +10,7 @@ const PASSWORD = "correct-horse-1";
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 const ctxA = await browser.newContext({ viewport: { width: 1200, height: 900 } });
 await ctxA.grantPermissions(["clipboard-read", "clipboard-write"]);
 const a = await ctxA.newPage();

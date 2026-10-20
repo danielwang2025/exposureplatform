@@ -1,6 +1,6 @@
 // v1.1 M3 end-to-end: growth reports — create, pick highlights, view, print
 // to PDF, and what a viewer sees (no private posts, no private reports).
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 import { statSync } from "node:fs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
@@ -15,7 +15,7 @@ const PASSWORD = "correct-horse-1";
 const step = (msg) => console.log("✓", msg);
 const assert = (cond, msg) => { if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`); };
 
-const browser = await chromium.launch();
+const browser = await launch();
 
 async function signup(page, user, next) {
   await page.goto(`${BASE}/signup${next ? `?next=${encodeURIComponent(next)}&email=${encodeURIComponent(user.email)}` : ""}`);

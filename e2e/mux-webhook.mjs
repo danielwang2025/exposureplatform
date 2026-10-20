@@ -8,7 +8,7 @@
 //   MUX_SIGNING_KEY_ID=testkey MUX_SIGNING_KEY_PRIVATE=$(base64 < /tmp/mux.pem | tr -d '\n') \
 //   npx next start -p 3001
 // then: set -a; source .env.local; set +a; node e2e/mux-webhook.mjs
-import { chromium } from "playwright";
+import { launch } from "./browser.mjs";
 import { createHmac, randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
@@ -73,7 +73,7 @@ assert(prof.storage_used_bytes === 5_000_000, `quota after refund: ${prof.storag
 step("videos over 5 minutes are rejected and their quota refunded");
 
 // 5. Timeline renders a Mux player with signed tokens, and a failed tile.
-const browser = await chromium.launch();
+const browser = await launch();
 const page = await browser.newPage();
 await page.goto(`${BASE}/login`);
 await page.fill("#email", email);
